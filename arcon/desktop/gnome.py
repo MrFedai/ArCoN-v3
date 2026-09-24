@@ -12,6 +12,7 @@ from arcon.core.action import Action, Change, Context, Reversible, Risk, registe
 from arcon.dotfiles.rules import WALLPAPER_KEYS, WALLPAPER_SECTIONS
 from arcon.package.actions import request
 from arcon.package.providers import native_for
+from arcon.recovery.backup import dconf_user
 
 BLOAT = ("gnome-tour", "gnome-weather", "gnome-maps", "gnome-contacts", "gnome-music", "epiphany")
 OWNER_KEYS = ("/org/gnome/desktop/interface/color-scheme", "/org/gnome/desktop/interface/gtk-theme")
@@ -78,7 +79,7 @@ class ApplyGnomeSettings(Action):
         return changes
 
     def apply(self, ctx):
-        dump = ctx.runner.run(["dconf", "dump", "/"], mutating=False).stdout
+        dump = dconf_user(ctx.runner, "dump", "/", mutating=False).stdout  # user db only
         backup = ctx.journal.backup_dir / "dconf-full.ini"
         backup.parent.mkdir(parents=True, exist_ok=True)
         backup.write_text(dump)

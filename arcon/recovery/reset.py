@@ -10,7 +10,7 @@ import shutil
 from arcon.core.action import Action, Change, Context, Reversible, Risk
 from arcon.package import catalog as cat
 from arcon.package.providers import native_for
-from arcon.recovery.backup import backup_dir
+from arcon.recovery.backup import backup_dir, dconf_user
 
 # v2.5 PROTECTED_PKGS (tests/golden/v25/packages.json) — never removed
 PROTECTED = {"base", "base-devel", "linux", "linux-firmware", "sudo", "pacman", "yay", "systemd", "systemd-libs",
@@ -60,7 +60,7 @@ class ResetGnome(Action):
         return [Change("setting", "dconf /", "reset to defaults")]
 
     def apply(self, ctx):
-        dump = ctx.runner.run(["dconf", "dump", "/"], mutating=False).stdout
+        dump = dconf_user(ctx.runner, "dump", "/", mutating=False).stdout  # user db only
         path = ctx.journal.backup_dir / "dconf-full.ini"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(dump)

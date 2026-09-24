@@ -21,6 +21,23 @@ from arcon.core.runner import Runner
 from arcon.recovery.journal import Journal
 
 
+# `dconf dump /` shows the MERGED view: the user's database plus system databases
+# (e.g. Fedora's authselect keys under /org/gnome/login-screen, which are also
+# locked). Backups and restores work on the user's own database only, so a
+# restore never tries to write system defaults or locked keys (CI run
+# 36056633594: rollback failed on Fedora with "non-writable keys").
+USER_ONLY_DCONF_PROFILE = "user-db:user\n"
+
+
+def dconf_user(runner: Runner, *args: str, input: str | None = None, mutating: bool = True):
+    """Run `dconf <args>` against the user database only (DCONF_PROFILE)."""
+    with tempfile.TemporaryDirectory(prefix="arcon-dconf-") as tmp:
+        profile = Path(tmp) / "profile"
+        profile.write_text(USER_ONLY_DCONF_PROFILE)
+        env = dict(os.environ, DCONF_PROFILE=str(profile))
+        return runner.run(["dconf", *args], input=input, env=env, mutating=mutating)
+
+
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -126,8 +143,8 @@ def restore_files(journal: Journal, runner: Runner) -> list[str]:
         if ev["event"] == "dconf_backup":
             dump = Path(ev["path"])
             if dump.exists():
-                runner.run(["dconf", "reset", "-f", "/"])
-                runner.run(["dconf", "load", "/"], input=dump.read_text())
+                dconf_user(runner, "reset", "-f", "/")
+                dconf_user(runner, "load", "/", input=dump.read_text())
                 report.append("restored GNOME settings (dconf) from the full backup")
             else:
                 report.append(f"MISSING BACKUP {dump}")

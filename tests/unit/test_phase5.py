@@ -21,7 +21,7 @@ from arcon.hardware.linux import GPU, Hardware
 from arcon.optimization.actions import Cache, _bluetooth
 from arcon.platform.detect import Family, OSInfo, Tier
 from arcon.core import preflight
-from arcon.recovery.backup import FileChanger, restore_files
+from arcon.recovery.backup import FileChanger, dconf_user, restore_files
 from arcon.recovery.journal import Journal
 from arcon.recovery.reset import CONFIGS, PROTECTED, ResetConfigs, ResetPackages
 from arcon.security.actions import SYSCTL, Firewall, SshDropIn
@@ -297,3 +297,26 @@ def test_stale_pacman_lock_is_asked_not_silently_removed(tmp_path, monkeypatch):
     ui = UI(Console(file=io.StringIO()), input_fn=lambda _p: next(feed), interactive=True)
     assert not preflight.run(ARCH, runner, ui, needs_network=False, dry_run=False, root=tmp_path)
     assert not any("rm" in c for c in runner.calls)
+
+
+def test_dconf_backup_and_restore_use_the_user_database_only(tmp_path):
+    # `dconf dump /` merges system databases (Fedora: locked authselect keys);
+    # restoring those failed with "non-writable keys" (CI run 36056633594)
+    seen = []
+
+    class Recorder(FakeRunner):
+        def run(self, argv, **kw):
+            profile = (kw.get("env") or {}).get("DCONF_PROFILE")
+            seen.append((tuple(argv), Path(profile).read_text() if profile else None))
+            return super().run(argv, **kw)
+
+    runner = Recorder().on("dconf", "dump", result="[org/gnome/desktop/interface]\ncolor-scheme='prefer-dark'\n")
+    assert "prefer-dark" in dconf_user(runner, "dump", "/", mutating=False).stdout
+    journal = Journal.create(tmp_path / "runs")
+    dump = journal.backup_dir / "dconf-full.ini"
+    dump.parent.mkdir(parents=True, exist_ok=True)
+    dump.write_text("[org/gnome/desktop/interface]\ncolor-scheme='default'\n")
+    journal.write("dconf_backup", path=str(dump))
+    restore_files(journal, runner)
+    dconf_calls = [(argv[1], prof) for argv, prof in seen]
+    assert dconf_calls == [("dump", "user-db:user\n"), ("reset", "user-db:user\n"), ("load", "user-db:user\n")]

@@ -14,20 +14,20 @@ Source of feature IDs: `docs/AUDIT.md` §2. Update this file in every phase.
 | F04 | sudo check | core/preflight.py + core/runner.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F05 | Live-USB detection | core/preflight.py | fix (was commented out) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F06 | OS detection | platform/detect.py | fix (parse, don't source) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
-| F07 | package-manager selection | package/registry.py | replace | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F08 | package groups (76 → 7 groups, 70 kept, 6 removed: D28) | data/packages.toml | replace (per-distro names) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F07 | package-manager selection | package/providers.py | replace | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT; dry-run against real apt in Ubuntu 24.04 container) | MIGRATED (UNIT) | stub | stub |
+| F08 | package groups (76 → 7 groups, 70 kept, 6 removed: D28) | arcon/data/packages.toml | replace (per-distro names) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT; dry-run against real apt in Ubuntu 24.04 container) | MIGRATED (UNIT) | stub | stub |
 | F09 | main menu | cli.py / core/wizard.py | replace (D14) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | F10 | Smart Factory Reset | recovery/reset.py | fix (D19: explicit paths, protected list, verified backup) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F11 | resume | recovery/journal.py | fix (never worked) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | F12 | GPG / keyring reset | package/pacman.py | fix (opt-in reset) | no | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F13 | reflector mirror benchmark | package/pacman.py | keep + backup | yes | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F14 | speed test | core/preflight.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F15 | yay-bin build | package/aur.py | keep (temp dir) | yes | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
+| F15 | yay-bin build | package/actions.py (InstallAurHelper) | keep (temp dir) | yes | MIGRATED (UNIT) | N-A | N-A | N-A | N-A | N-A |
 | F16 | deps + system upgrade | package/* | fix (no partial upgrade) | no | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F17 | GNOME settings (gno.conf) | desktop/gnome.py + dotfiles/deploy.py | keep (D8; D18 default wallpaper = solid black) | yes (dconf dump) | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | N-A | N-A |
 | F18 | GNOME debloat | desktop/gnome.py | keep | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | N-A | N-A |
 | F19 | Gaming Mode + GPU drivers | gaming/* + hardware/gpu.py | fix (decouple from GNOME, detect GPU) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F20 | package engine (preview, pacs.txt, AUR split) | package/* | keep (batch install) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F20 | package engine (preview, pacs.txt, AUR split) | package/resolve.py + package/actions.py | keep (batch install) | partial | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT; dry-run against real apt in Ubuntu 24.04 container) | MIGRATED (UNIT) | stub | stub |
 | F21 | BlackArch manager | security/blackarch.py | fix (checksum, key, no --overwrite default) | partial | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F22 | Hyprland + theme installers | desktop/hyprland.py + desktop/third_party.py | keep optional (D12), installers ONE-WAY (D16) | ONE-WAY | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | N-A | N-A |
 | F23 | Terminator config + wallpapers | dotfiles/deploy.py | keep + backup/diff (D10) | yes | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | N-A | stub |
@@ -41,7 +41,7 @@ Source of feature IDs: `docs/AUDIT.md` §2. Update this file in every phase.
 | F31 | final summary | core/report.py | fix (from journal) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | F32 | cleanup (orphans, cache) | optimization/cleanup.py | fix (no -Scc default) | no | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F33 | reboot prompt | core/reboot.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| N1 | monitor mode detection + layout (D13) | display/* | new | yes | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| N1 | monitor mode detection + layout (D13) | display/* | new | yes | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | N2 | dotfile capture / diff (D10) | dotfiles/capture.py, dotfiles/diff.py | new | yes | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | N3 | wizard → summary → single confirm, saved answers (D14) | core/wizard.py, core/profile.py | new | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | N4 | dry-run for every action | core/runner.py | new | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |

@@ -35,3 +35,16 @@ D20–D28 recorded (Arch dual-boot + NVIDIA, English + rich CLI, Flatpak fallbac
 - **NOT tested:** snapshot creation (no Snapper/Timeshift here); root-owned file writes only with FakeRunner; `setup.sh` uv installation path (uv already present).
 - **Risks:** no feature modules yet — `arcon plan` reports "nothing to do" until Phase 4/5.
 - **Deviations:** none.
+
+## Phase 4 — hardware, display, packages
+
+- **Done:**
+  - `arcon/hardware/linux.py` — GPUs from sysfs (vendor, PCI device id, boot VGA, hybrid), NVIDIA open-module capability (device id ≥ 0x1E00 = Turing+), RAM, root disk SSD/HDD, battery, installed kernel flavours (`/usr/lib/modules/*/pkgbase`), virtualization.
+  - `arcon/display/` — monitor model, D13 mode ranking (resolution-first / refresh-first), layout that keeps order/y/scale and recomputes x so neighbours touch; GNOME backend over Mutter `org.gnome.Mutter.DisplayConfig` (jeepney): dry run = Mutter **verify** method, real run = persistent, per-monitor fallback to the next mode when a mode does not become active; Hyprland backend (`hyprctl monitors all -j`, `highres`/`highrr` when Hyprland is not running) and the D18 generated monitor block. `arcon display show|capture` (capture writes the current layout into the profile).
+  - `arcon/data/packages.toml` — 126 logical packages (D28 groups + internal groups), explicit `aur:` markers; `scripts/verify_catalog.py`; `docs/PACKAGE_CATALOG.md`.
+  - `arcon/package/` — pacman, AUR helper (yay/paru, as user), apt (Debian+Ubuntu), dnf, Flatpak; one transaction per source; resolution native → AUR (Arch) → Flatpak (D22) → reported as unavailable. User extras that exist nowhere are reported, never sent to yay (v2.5 bug #15). `packages` module: native, AUR helper bootstrap (yay-bin via makepkg in a temp dir), AUR, Flathub, Flatpak actions.
+  - `tests/golden/v3/hyprland.conf` (deferred from Phase 2) — obeys D18.
+- **Evidence:** `uv run pytest` → 105 passed (23 new). Ubuntu 24.04 container: `verify_catalog.py` 81 ok / 7 missing (handled at runtime); `arcon --profile profiles/mrfedai.toml plan` resolved against the real apt index (28 repo packages, Flatpak fallback for 11, 5 reported unavailable).
+- **NOT tested:** real Mutter D-Bus (no GNOME session here) — the GNOME backend is UNIT TESTED against a fake Mutter only; Hyprland `desc:` matching on real Hyprland; Arch/Debian/Fedora package queries (CI, Phase 7); Flathub ids (flathub.org unreachable); AUR helper build.
+- **Risks:** Mutter's API details (`ApplyMonitorsConfig` signature, variant layout) are implemented from the documented interface, not exercised against a live session — first native run must use `arcon plan` (verify method) before `apply`. NVIDIA "open capable" threshold is a PCI id heuristic.
+- **Deviations:** none. Hyprland group installs nautilus' role via GNOME (the v2.5 config uses nautilus; v2.5 installed dolphin, N-06) — dolphin is no longer installed.

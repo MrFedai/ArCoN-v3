@@ -47,7 +47,8 @@ class Runner(Protocol):
 
     def run(self, argv: Sequence[str], *, sudo: bool = False, mutating: bool = True,
             check: bool = True, input: str | None = None, timeout: float | None = None,
-            env: dict[str, str] | None = None) -> Result: ...
+            env: dict[str, str] | None = None, cwd: str | None = None,
+            interactive: bool = False) -> Result: ...
 
 
 def _full_argv(argv: Sequence[str], sudo: bool) -> tuple[str, ...]:
@@ -59,12 +60,16 @@ def _full_argv(argv: Sequence[str], sudo: bool) -> tuple[str, ...]:
 class SystemRunner:
     dry_run = False
 
-    def run(self, argv, *, sudo=False, mutating=True, check=True, input=None, timeout=None, env=None):
+    def run(self, argv, *, sudo=False, mutating=True, check=True, input=None, timeout=None, env=None, cwd=None, interactive=False):
         full = _full_argv(argv, sudo)
         log.info("run%s: %s", " (mutating)" if mutating else "", shlex.join(full))
         try:
-            proc = subprocess.run(full, input=input, capture_output=True, text=True,
-                                  timeout=timeout or DEFAULT_TIMEOUT, env=env)
+            if interactive:  # long package transactions: the user sees progress and prompts
+                proc = subprocess.run(full, text=True, timeout=timeout or DEFAULT_TIMEOUT, env=env, cwd=cwd)
+                proc.stdout, proc.stderr = "", ""
+            else:
+                proc = subprocess.run(full, input=input, capture_output=True, text=True,
+                                      timeout=timeout or DEFAULT_TIMEOUT, env=env, cwd=cwd)
         except FileNotFoundError:
             result = Result(full, 127, "", f"{full[0]}: command not found")
         except subprocess.TimeoutExpired as exc:
@@ -87,14 +92,14 @@ class DryRunRunner:
         self._probe = probe or SystemRunner()
         self.planned: list[tuple[str, ...]] = []
 
-    def run(self, argv, *, sudo=False, mutating=True, check=True, input=None, timeout=None, env=None):
+    def run(self, argv, *, sudo=False, mutating=True, check=True, input=None, timeout=None, env=None, cwd=None, interactive=False):
         full = _full_argv(argv, sudo)
         if mutating:
             self.planned.append(full)
             log.info("dry-run, not executed: %s", shlex.join(full))
             return Result(full, 0, executed=False)
         return self._probe.run(argv, sudo=sudo, mutating=False, check=check,
-                               input=input, timeout=timeout, env=env)
+                               input=input, timeout=timeout, env=env, cwd=cwd, interactive=interactive)
 
 
 Handler = Callable[[tuple[str, ...], str | None], Result | int | str]
@@ -115,7 +120,7 @@ class FakeRunner:
         self.responses[tuple(prefix)] = result
         return self
 
-    def run(self, argv, *, sudo=False, mutating=True, check=True, input=None, timeout=None, env=None):
+    def run(self, argv, *, sudo=False, mutating=True, check=True, input=None, timeout=None, env=None, cwd=None, interactive=False):
         full = _full_argv(argv, sudo)
         self.calls.append(full)
         self.inputs.append(input)

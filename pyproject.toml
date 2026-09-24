@@ -6,8 +6,9 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = [
-    "rich>=13",       # coloured CLI: tables, prompts, progress (D21)
-    "tomlkit>=0.12",  # TOML writer that keeps comments/order of hand-edited profiles (D21)
+    "jeepney>=0.8",   # pure-Python D-Bus: GNOME Mutter DisplayConfig (D13)
+    "rich>=13", # coloured CLI: tables, prompts, progress (D21)
+    "tomlkit>=0.12", # TOML writer that keeps comments/order of hand-edited profiles (D21)
 ]
 
 [project.scripts]

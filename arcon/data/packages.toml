@@ -1,0 +1,923 @@
+# ArCoN v3 package catalog (CLAUDE.md D28).
+#
+# One table per logical package. Columns per distro; "" = not packaged there
+# (Flatpak fallback applies when `flatpak` is set, D22). `ubuntu` defaults to `debian`.
+# arch: "aur:NAME" = AUR (built with the AUR helper); a plain name is looked up in
+#       the official repositories first (pacman -Si) and falls back to the AUR.
+#
+# Source: v3.0 reference branch catalog (D17). Verification status per column is
+# recorded in docs/PACKAGE_CATALOG.md — run scripts/verify_catalog.py to refresh.
+
+[pkg.curl]
+groups = ["base"]
+arch = "curl"
+debian = "curl"
+fedora = "curl"
+description = "HTTP client"
+
+[pkg.dosfstools]
+groups = ["base"]
+arch = "dosfstools"
+debian = "dosfstools"
+fedora = "dosfstools"
+description = "FAT tools (Linux)"
+
+[pkg.git]
+groups = ["base"]
+arch = "git"
+debian = "git"
+fedora = "git"
+description = "Git version control"
+
+[pkg.man-db]
+groups = ["base"]
+arch = "man-db"
+debian = "man-db"
+fedora = "man-db"
+description = "Manual page reader"
+
+[pkg.man-pages]
+groups = ["base"]
+arch = "man-pages"
+debian = "manpages"
+fedora = "man-pages"
+description = "Linux manual pages"
+
+[pkg.ntfs-3g]
+groups = ["base"]
+arch = "ntfs-3g"
+debian = "ntfs-3g"
+fedora = "ntfs-3g"
+description = "NTFS driver (Linux)"
+
+[pkg.unzip]
+groups = ["base"]
+arch = "unzip"
+debian = "unzip"
+fedora = "unzip"
+description = "ZIP extraction"
+
+[pkg.wget]
+groups = ["base"]
+arch = "wget"
+debian = "wget"
+fedora = "wget2-wget"
+description = "HTTP downloader"
+
+[pkg.zip]
+groups = ["base"]
+arch = "zip"
+debian = "zip"
+fedora = "zip"
+description = "ZIP archiver (7-Zip on Windows)"
+
+[pkg.btop]
+groups = ["essentials"]
+arch = "btop"
+debian = "btop"
+fedora = "btop"
+description = "Resource monitor"
+
+[pkg.code]
+groups = ["essentials"]
+arch = "code"
+debian = ""
+fedora = ""
+flatpak = "com.visualstudio.code"
+description = "Visual Studio Code / Code-OSS"
+
+[pkg.fastfetch]
+groups = ["essentials"]
+arch = "fastfetch"
+debian = "fastfetch"
+fedora = "fastfetch"
+description = "System information"
+
+[pkg.firefox]
+groups = ["essentials"]
+arch = "firefox"
+debian = "firefox-esr"
+ubuntu = "firefox"
+fedora = "firefox"
+flatpak = "org.mozilla.firefox"
+description = "Firefox browser"
+
+[pkg.google-chrome]
+groups = ["essentials"]
+arch = "aur:google-chrome"
+debian = ""
+fedora = ""
+flatpak = "com.google.Chrome"
+description = "Google Chrome browser"
+
+[pkg.localsend]
+groups = ["essentials"]
+arch = "aur:localsend-bin"
+debian = ""
+fedora = ""
+flatpak = "org.localsend.localsend_app"
+description = "LAN file sharing"
+
+[pkg.neovim]
+groups = ["essentials"]
+arch = "neovim"
+debian = "neovim"
+fedora = "neovim"
+description = "Neovim editor"
+
+[pkg.planify]
+groups = ["essentials"]
+arch = "planify"
+debian = ""
+fedora = ""
+flatpak = "io.github.alainm23.planify"
+description = "Planify task manager"
+
+[pkg.telegram-desktop]
+groups = ["essentials"]
+arch = "telegram-desktop"
+debian = ""
+fedora = ""
+flatpak = "org.telegram.desktop"
+description = "Telegram messenger"
+
+[pkg.vim]
+groups = ["essentials"]
+arch = "vim"
+debian = "vim"
+fedora = "vim-enhanced"
+description = "Vim editor"
+
+[pkg.vlc]
+groups = ["essentials"]
+arch = "vlc"
+debian = "vlc"
+fedora = "vlc"
+flatpak = "org.videolan.VLC"
+description = "VLC media player"
+
+[pkg.audacity]
+groups = ["media"]
+arch = "audacity"
+debian = "audacity"
+fedora = "audacity"
+flatpak = "org.audacityteam.Audacity"
+description = "Audio editor"
+
+[pkg.blender]
+groups = ["media"]
+arch = "blender"
+debian = "blender"
+fedora = "blender"
+flatpak = "org.blender.Blender"
+description = "3D suite"
+
+[pkg.discord]
+groups = ["media"]
+arch = "discord"
+debian = ""
+fedora = ""
+flatpak = "com.discordapp.Discord"
+description = "Discord chat"
+
+[pkg.easyeffects]
+groups = ["media"]
+arch = "easyeffects"
+debian = "easyeffects"
+fedora = "easyeffects"
+flatpak = "com.github.wwmm.easyeffects"
+description = "PipeWire audio effects"
+
+[pkg.gimp]
+groups = ["media"]
+arch = "gimp"
+debian = "gimp"
+fedora = "gimp"
+flatpak = "org.gimp.GIMP"
+description = "Image editor"
+
+[pkg.inkscape]
+groups = ["media"]
+arch = "inkscape"
+debian = "inkscape"
+fedora = "inkscape"
+flatpak = "org.inkscape.Inkscape"
+description = "Vector editor"
+
+[pkg.kdenlive]
+groups = ["media"]
+arch = "kdenlive"
+debian = "kdenlive"
+fedora = "kdenlive"
+flatpak = "org.kde.kdenlive"
+description = "Video editor"
+
+[pkg.libreoffice]
+groups = ["media"]
+arch = "libreoffice-fresh"
+debian = "libreoffice"
+fedora = "libreoffice"
+flatpak = "org.libreoffice.LibreOffice"
+description = "Office suite"
+
+[pkg.losslesscut]
+groups = ["media"]
+arch = "aur:losslesscut-bin"
+debian = ""
+fedora = ""
+flatpak = "no.mifi.losslesscut"
+description = "Lossless video cutter"
+
+[pkg.obs-studio]
+groups = ["media"]
+arch = "obs-studio"
+debian = "obs-studio"
+fedora = "obs-studio"
+flatpak = "com.obsproject.Studio"
+description = "Streaming / recording"
+
+[pkg.obsidian]
+groups = ["media"]
+arch = "obsidian"
+debian = ""
+fedora = ""
+flatpak = "md.obsidian.Obsidian"
+description = "Markdown knowledge base"
+
+[pkg.shortwave]
+groups = ["media"]
+arch = "shortwave"
+debian = "shortwave"
+fedora = ""
+flatpak = "de.haeckerfelix.Shortwave"
+description = "Internet radio"
+
+[pkg.spotify]
+groups = ["media"]
+arch = "aur:spotify"
+debian = ""
+fedora = ""
+flatpak = "com.spotify.Client"
+description = "Spotify client"
+
+[pkg.upscayl]
+groups = ["media"]
+arch = "aur:upscayl-bin"
+debian = ""
+fedora = ""
+flatpak = "org.upscayl.Upscayl"
+description = "AI image upscaler"
+
+[pkg.aircrack-ng]
+groups = ["cyber"]
+arch = "aircrack-ng"
+debian = "aircrack-ng"
+fedora = "aircrack-ng"
+description = "Wi-Fi security suite"
+
+[pkg.bettercap]
+groups = ["cyber"]
+arch = "bettercap"
+debian = "bettercap"
+fedora = ""
+description = "Network attack/monitor tool"
+
+[pkg.burpsuite]
+groups = ["cyber"]
+arch = "burpsuite"
+debian = ""
+fedora = ""
+description = "Web security proxy"
+
+[pkg.exploitdb]
+groups = ["cyber"]
+arch = "exploitdb"
+debian = ""
+fedora = ""
+description = "Exploit database (searchsploit)"
+
+[pkg.ghidra]
+groups = ["cyber"]
+arch = "ghidra"
+debian = ""
+fedora = ""
+description = "Reverse engineering suite"
+
+[pkg.gobuster]
+groups = ["cyber"]
+arch = "gobuster"
+debian = "gobuster"
+fedora = ""
+description = "Directory/DNS brute forcer"
+
+[pkg.hashcat]
+groups = ["cyber"]
+arch = "hashcat"
+debian = "hashcat"
+fedora = "hashcat"
+description = "Password recovery"
+
+[pkg.hydra]
+groups = ["cyber"]
+arch = "hydra"
+debian = "hydra"
+fedora = "hydra"
+description = "Login brute forcer"
+
+[pkg.john]
+groups = ["cyber"]
+arch = "john"
+debian = "john"
+fedora = "john"
+description = "John the Ripper"
+
+[pkg.masscan]
+groups = ["cyber"]
+arch = "masscan"
+debian = "masscan"
+fedora = "masscan"
+description = "Mass IP port scanner"
+
+[pkg.metasploit]
+groups = ["cyber"]
+arch = "metasploit"
+debian = ""
+fedora = ""
+description = "Exploitation framework"
+
+[pkg.nikto]
+groups = ["cyber"]
+arch = "nikto"
+debian = "nikto"
+fedora = "nikto"
+description = "Web server scanner"
+
+[pkg.nmap]
+groups = ["cyber"]
+arch = "nmap"
+debian = "nmap"
+fedora = "nmap"
+description = "Network scanner"
+
+[pkg.radare2]
+groups = ["cyber"]
+arch = "radare2"
+debian = "radare2"
+fedora = "radare2"
+description = "Reverse engineering framework"
+
+[pkg.sqlmap]
+groups = ["cyber"]
+arch = "sqlmap"
+debian = "sqlmap"
+fedora = "sqlmap"
+description = "SQL injection tool"
+
+[pkg.wireshark]
+groups = ["cyber"]
+arch = "wireshark-qt"
+debian = "wireshark"
+fedora = "wireshark"
+description = "Packet analyzer"
+
+[pkg.anydesk]
+groups = ["remote"]
+arch = "aur:anydesk-bin"
+debian = ""
+fedora = ""
+flatpak = "com.anydesk.Anydesk"
+description = "AnyDesk remote desktop"
+
+[pkg.freerdp]
+groups = ["remote"]
+arch = "freerdp"
+debian = "freerdp3-x11"
+fedora = "freerdp"
+description = "RDP client"
+
+[pkg.remmina]
+groups = ["remote"]
+arch = "remmina"
+debian = "remmina"
+fedora = "remmina"
+flatpak = "org.remmina.Remmina"
+description = "Remote desktop client"
+
+[pkg.rustdesk]
+groups = ["remote"]
+arch = "aur:rustdesk-bin"
+debian = ""
+fedora = ""
+flatpak = "com.rustdesk.RustDesk"
+description = "RustDesk remote desktop"
+
+[pkg.metadata-cleaner]
+groups = ["privacy"]
+arch = "metadata-cleaner"
+debian = "metadata-cleaner"
+fedora = ""
+flatpak = "fr.romainvigier.MetadataCleaner"
+description = "Metadata cleaner"
+
+[pkg.networkmanager-openvpn]
+groups = ["privacy"]
+arch = "networkmanager-openvpn"
+debian = "network-manager-openvpn"
+fedora = "NetworkManager-openvpn"
+description = "NetworkManager OpenVPN plugin"
+
+[pkg.onionshare]
+groups = ["privacy"]
+arch = "onionshare"
+debian = "onionshare"
+fedora = "onionshare"
+flatpak = "org.onionshare.OnionShare"
+description = "Anonymous file sharing"
+
+[pkg.openvpn]
+groups = ["privacy"]
+arch = "openvpn"
+debian = "openvpn"
+fedora = "openvpn"
+description = "OpenVPN"
+
+[pkg.protonvpn]
+groups = ["privacy"]
+arch = "proton-vpn-gtk-app"
+debian = ""
+fedora = ""
+flatpak = "com.protonvpn.www"
+description = "Proton VPN"
+
+[pkg.riseup-vpn]
+groups = ["privacy"]
+arch = "riseup-vpn"
+debian = "riseup-vpn"
+fedora = ""
+description = "Riseup VPN client"
+
+[pkg.torbrowser-launcher]
+groups = ["privacy"]
+arch = "torbrowser-launcher"
+debian = "torbrowser-launcher"
+fedora = "torbrowser-launcher"
+flatpak = "org.torproject.torbrowser-launcher"
+description = "Tor Browser"
+
+[pkg.wireguard-tools]
+groups = ["privacy"]
+arch = "wireguard-tools"
+debian = "wireguard-tools"
+fedora = "wireguard-tools"
+description = "WireGuard tools"
+
+[pkg.bleachbit]
+groups = ["power"]
+arch = "bleachbit"
+debian = "bleachbit"
+fedora = "bleachbit"
+description = "Disk cleaner"
+
+[pkg.clapgrep]
+groups = ["power"]
+arch = "clapgrep"
+debian = ""
+fedora = ""
+flatpak = "de.leopoldluley.Clapgrep"
+description = "Document search GUI"
+
+[pkg.converseen]
+groups = ["power"]
+arch = "converseen"
+debian = "converseen"
+fedora = "converseen"
+flatpak = "net.fasterland.converseen"
+description = "Batch image converter"
+
+[pkg.devtoys]
+groups = ["power"]
+arch = "aur:devtoys-bin"
+debian = ""
+fedora = ""
+description = "Developer utilities"
+
+[pkg.qemu]
+groups = ["power"]
+arch = "qemu-desktop"
+debian = "qemu-system-x86"
+fedora = "qemu-kvm"
+description = "QEMU emulator"
+
+[pkg.virt-manager]
+groups = ["power"]
+arch = "virt-manager"
+debian = "virt-manager"
+fedora = "virt-manager"
+description = "Virtual machine manager"
+
+[pkg.timeshift]
+groups = ["recovery"]
+arch = "timeshift"
+debian = "timeshift"
+fedora = "timeshift"
+description = "System snapshots (Linux)"
+
+[pkg.ananicy-cpp]
+groups = ["optimize"]
+arch = "ananicy-cpp"
+debian = ""
+fedora = ""
+description = "Auto-nice daemon"
+
+[pkg.pacman-contrib]
+groups = ["optimize"]
+arch = "pacman-contrib"
+debian = ""
+fedora = ""
+description = "paccache & friends"
+
+[pkg.power-profiles-daemon]
+groups = ["optimize"]
+arch = "power-profiles-daemon"
+debian = "power-profiles-daemon"
+fedora = "power-profiles-daemon"
+description = "Power profiles"
+
+[pkg.zram-generator]
+groups = ["optimize"]
+arch = "zram-generator"
+debian = "systemd-zram-generator"
+fedora = "zram-generator"
+description = "zram swap generator"
+
+[pkg.base-devel]
+groups = ["tooling"]
+arch = "base-devel"
+debian = "build-essential"
+fedora = "@development-tools"
+description = "Compiler toolchain"
+
+[pkg.flatpak]
+groups = ["tooling"]
+arch = "flatpak"
+debian = "flatpak"
+fedora = "flatpak"
+description = "Flatpak runtime"
+
+[pkg.reflector]
+groups = ["tooling"]
+arch = "reflector"
+debian = ""
+fedora = ""
+description = "Arch mirror ranking"
+
+[pkg.gamemode]
+groups = ["gaming"]
+arch = "gamemode"
+debian = "gamemode"
+fedora = "gamemode"
+description = "Feral GameMode"
+
+[pkg.lib32-gamemode]
+groups = ["gaming"]
+arch = "lib32-gamemode"
+debian = ""
+fedora = ""
+description = "GameMode 32-bit"
+
+[pkg.lib32-mangohud]
+groups = ["gaming"]
+arch = "lib32-mangohud"
+debian = ""
+fedora = ""
+description = "MangoHud 32-bit"
+
+[pkg.mangohud]
+groups = ["gaming"]
+arch = "mangohud"
+debian = "mangohud"
+fedora = "mangohud"
+description = "Performance overlay"
+
+[pkg.steam]
+groups = ["gaming"]
+arch = "steam"
+debian = ""
+fedora = ""
+flatpak = "com.valvesoftware.Steam"
+description = "Steam client"
+
+[pkg.vulkan-tools]
+groups = ["gaming"]
+arch = "vulkan-tools"
+debian = "vulkan-tools"
+fedora = "vulkan-tools"
+description = "vulkaninfo"
+
+[pkg.lib32-mesa]
+groups = ["gpu"]
+arch = "lib32-mesa"
+debian = ""
+fedora = ""
+description = "Mesa 32-bit"
+
+[pkg.lib32-nvidia-utils]
+groups = ["gpu"]
+arch = "lib32-nvidia-utils"
+debian = ""
+fedora = ""
+description = "NVIDIA userspace 32-bit"
+
+[pkg.lib32-vulkan-intel]
+groups = ["gpu"]
+arch = "lib32-vulkan-intel"
+debian = ""
+fedora = ""
+description = "ANV Vulkan 32-bit"
+
+[pkg.lib32-vulkan-radeon]
+groups = ["gpu"]
+arch = "lib32-vulkan-radeon"
+debian = ""
+fedora = ""
+description = "RADV Vulkan 32-bit"
+
+[pkg.mesa]
+groups = ["gpu"]
+arch = "mesa"
+debian = "mesa-utils"
+fedora = "mesa-dri-drivers"
+description = "Mesa OpenGL"
+
+[pkg.nvidia-open]
+groups = ["gpu"]
+arch = "nvidia-open"
+debian = ""
+fedora = ""
+description = "NVIDIA open kernel modules (Turing+)"
+
+[pkg.nvidia-open-dkms]
+groups = ["gpu"]
+arch = "nvidia-open-dkms"
+debian = ""
+fedora = ""
+description = "NVIDIA open kernel modules (DKMS)"
+
+[pkg.nvidia-settings]
+groups = ["gpu"]
+arch = "nvidia-settings"
+debian = ""
+fedora = ""
+description = "NVIDIA settings GUI"
+
+[pkg.nvidia-utils]
+groups = ["gpu"]
+arch = "nvidia-utils"
+debian = ""
+fedora = ""
+description = "NVIDIA userspace"
+
+[pkg.vulkan-intel]
+groups = ["gpu"]
+arch = "vulkan-intel"
+debian = "mesa-vulkan-drivers"
+fedora = "mesa-vulkan-drivers"
+description = "ANV Vulkan"
+
+[pkg.vulkan-radeon]
+groups = ["gpu"]
+arch = "vulkan-radeon"
+debian = "mesa-vulkan-drivers"
+fedora = "mesa-vulkan-drivers"
+description = "RADV Vulkan"
+
+[pkg.xf86-video-amdgpu]
+groups = ["gpu"]
+arch = "xf86-video-amdgpu"
+debian = ""
+fedora = ""
+description = "AMDGPU Xorg driver"
+
+[pkg.arch-audit]
+groups = ["security"]
+arch = "arch-audit"
+debian = ""
+fedora = ""
+description = "Arch CVE audit"
+
+[pkg.clamav]
+groups = ["security"]
+arch = "clamav"
+debian = "clamav"
+fedora = "clamav"
+description = "ClamAV antivirus"
+
+[pkg.clamav-freshclam]
+groups = ["security"]
+arch = ""
+debian = "clamav-freshclam"
+fedora = "clamav-update"
+description = "ClamAV signature updater"
+
+[pkg.debsecan]
+groups = ["security"]
+arch = ""
+debian = "debsecan"
+fedora = ""
+description = "Debian CVE audit"
+
+[pkg.firejail]
+groups = ["security"]
+arch = "firejail"
+debian = "firejail"
+fedora = "firejail"
+description = "Application sandbox"
+
+[pkg.lynis]
+groups = ["security"]
+arch = "lynis"
+debian = "lynis"
+fedora = "lynis"
+description = "Security auditing"
+
+[pkg.nethogs]
+groups = ["security"]
+arch = "nethogs"
+debian = "nethogs"
+fedora = "nethogs"
+description = "Per-process bandwidth"
+
+[pkg.rkhunter]
+groups = ["security"]
+arch = "rkhunter"
+debian = "rkhunter"
+fedora = "rkhunter"
+description = "Rootkit hunter"
+
+[pkg.ufw]
+groups = ["security"]
+arch = "ufw"
+debian = "ufw"
+fedora = ""
+description = "Uncomplicated firewall"
+
+[pkg.opensnitch]
+groups = ["hardened"]
+arch = "opensnitch"
+debian = "opensnitch"
+fedora = ""
+description = "Application firewall"
+
+[pkg.python3-opensnitch-ui]
+groups = ["hardened"]
+arch = ""
+debian = "python3-opensnitch-ui"
+fedora = ""
+description = "OpenSnitch UI (Debian)"
+
+[pkg.usbguard]
+groups = ["hardened"]
+arch = "usbguard"
+debian = "usbguard"
+fedora = "usbguard"
+description = "USB device authorization"
+
+[pkg.alacritty]
+groups = ["terminal"]
+arch = "alacritty"
+debian = "alacritty"
+fedora = "alacritty"
+description = "Alacritty terminal"
+
+[pkg.gnome-terminal]
+groups = ["terminal"]
+arch = "gnome-terminal"
+debian = "gnome-terminal"
+fedora = "gnome-terminal"
+description = "GNOME Terminal"
+
+[pkg.kitty]
+groups = ["terminal"]
+arch = "kitty"
+debian = "kitty"
+fedora = "kitty"
+description = "Kitty terminal"
+
+[pkg.terminator]
+groups = ["terminal"]
+arch = "terminator"
+debian = "terminator"
+fedora = "terminator"
+description = "Terminator terminal"
+
+[pkg.fish]
+groups = ["shell"]
+arch = "fish"
+debian = "fish"
+fedora = "fish"
+description = "Fish shell"
+
+[pkg.font-jetbrains-nerd]
+groups = ["shell"]
+arch = "ttf-jetbrains-mono-nerd"
+debian = ""
+fedora = ""
+description = "JetBrainsMono Nerd Font"
+
+[pkg.starship]
+groups = ["shell"]
+arch = "starship"
+debian = "starship"
+fedora = ""
+description = "Starship prompt"
+
+[pkg.zsh]
+groups = ["shell"]
+arch = "zsh"
+debian = "zsh"
+fedora = "zsh"
+description = "Z shell"
+
+[pkg.brightnessctl]
+groups = ["hyprland"]
+arch = "brightnessctl"
+debian = "brightnessctl"
+fedora = "brightnessctl"
+description = "Backlight control (hypridle)"
+
+[pkg.hypridle]
+groups = ["hyprland"]
+arch = "hypridle"
+debian = "hypridle"
+fedora = "hypridle"
+description = "Hyprland idle daemon"
+
+[pkg.hyprland]
+groups = ["hyprland"]
+arch = "hyprland"
+debian = "hyprland"
+fedora = "hyprland"
+description = "Hyprland compositor"
+
+[pkg.hyprlock]
+groups = ["hyprland"]
+arch = "hyprlock"
+debian = "hyprlock"
+fedora = "hyprlock"
+description = "Hyprland locker"
+
+[pkg.network-manager-applet]
+groups = ["hyprland"]
+arch = "network-manager-applet"
+debian = "network-manager-gnome"
+fedora = "network-manager-applet"
+description = "nm-applet tray"
+
+[pkg.polkit-gnome]
+groups = ["hyprland"]
+arch = "polkit-gnome"
+debian = "policykit-1-gnome"
+fedora = "polkit-gnome"
+description = "Polkit authentication agent"
+
+[pkg.waybar]
+groups = ["hyprland"]
+arch = "waybar"
+debian = "waybar"
+fedora = "waybar"
+description = "Status bar"
+
+[pkg.wofi]
+groups = ["hyprland"]
+arch = "wofi"
+debian = "wofi"
+fedora = "wofi"
+description = "Launcher"
+
+[pkg.xdg-desktop-portal-hyprland]
+groups = ["hyprland"]
+arch = "xdg-desktop-portal-hyprland"
+debian = "xdg-desktop-portal-hyprland"
+fedora = "xdg-desktop-portal-hyprland"
+description = "Hyprland portal"
+
+[pkg.adw-gtk-theme]
+groups = ["gnome"]
+arch = "adw-gtk-theme"
+debian = ""
+fedora = "adw-gtk3-theme"
+description = "libadwaita GTK3 theme"
+
+[pkg.gnome-shell-extension-clipboard-indicator]
+groups = ["gnome"]
+arch = "aur:gnome-shell-extension-clipboard-indicator"
+debian = ""
+fedora = ""
+description = "Clipboard extension"
+
+[pkg.wl-clipboard]
+groups = ["gnome"]
+arch = "wl-clipboard"
+debian = "wl-clipboard"
+fedora = "wl-clipboard"
+description = "Wayland clipboard"

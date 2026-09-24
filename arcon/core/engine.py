@@ -72,26 +72,28 @@ def build_plan(ctx: Context, actions: list[Action], done: set[str] = frozenset()
 
 def show_plan(ctx: Context, plan: Plan) -> None:
     ui = ctx.ui
-    rows = []
+    rows, kinds = [], {}
     for p in plan.items:
         if not p.changes:
             continue
         for c in p.changes:
-            rows.append((p.action.module, p.action.title, c.kind, c.target, c.detail,
-                         p.action.risk.value, p.action.reversible.value))
+            kinds[c.kind] = kinds.get(c.kind, 0) + 1
+        groups: dict[str, list[str]] = {}
+        for c in p.changes:
+            groups.setdefault(f"{c.kind}: {c.detail}" if c.detail and c.kind in ("package", "flatpak") else c.kind, []).append(
+                c.target if c.kind in ("package", "flatpak") else f"{c.target} ({c.detail})" if c.detail else c.target)
+        what = "\n".join(f"[bold]{k}[/bold] ({len(v)}): {', '.join(v)}" for k, v in groups.items())
+        rows.append((p.action.module, p.action.title, what, p.action.risk.value, p.action.reversible.value))
     if not rows:
         ui.ok("Nothing to do — the system already matches the profile.")
         return
-    ui.table("ArCoN plan", ("Module", "Action", "Kind", "Target", "Detail", "Risk", "Reversible"), rows)
-    kinds: dict[str, int] = {}
-    for r in rows:
-        kinds[r[2]] = kinds.get(r[2], 0) + 1
+    ui.table("ArCoN plan", ("Module", "Action", "Changes", "Risk", "Reversible"), rows)
     ui.info("Totals: " + ", ".join(f"{n} {k}" for k, n in sorted(kinds.items())))
     for p in plan.one_way:
         ui.warn(f"ONE-WAY: {p.action.title} runs third-party code and cannot be rolled back")
-    high = [p for p in plan.pending if p.action.risk is Risk.HIGH]
-    for p in high:
-        ui.warn(f"HIGH RISK: {p.action.title}")
+    for p in plan.pending:
+        if p.action.risk is Risk.HIGH:
+            ui.warn(f"HIGH RISK: {p.action.title}")
     skipped = [p for p in plan.items if p.status in ("skipped", "done")]
     if skipped:
         ui.info(f"{len(skipped)} action(s) already satisfied")

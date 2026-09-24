@@ -54,7 +54,9 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("runs", help="list previous runs")
     pr = sub.add_parser("profile", help="show / validate the profile")
     pr.add_argument("what", choices=("show", "path", "validate"))
-    sub.add_parser("doctor", help="show detected platform and recovery options")
+    sub.add_parser("doctor", help="show detected platform, hardware and recovery options")
+    dp = sub.add_parser("display", help="show monitors / save the current layout to the profile")
+    dp.add_argument("what", choices=("show", "capture"))
     return p
 
 
@@ -102,6 +104,8 @@ class App:
                                  os=self.os.id, resumed_from=resume_from.run_id if resume_from else None)
         setup_file_logging(journal.run_dir / "arcon.log", self.args.verbose)
         ctx = self.context(profile, journal)
+        from arcon import modules
+        modules.load()
         plan = build_plan(ctx, collect_actions(ctx), done)
         show_plan(ctx, plan)
         if not plan.pending:
@@ -198,12 +202,45 @@ class App:
         self.ui.console.print(tomlkit.dumps(profile.as_dict()), highlight=False, markup=False)
         return EXIT_OK
 
+    def cmd_display(self) -> int:
+        from arcon.display.actions import gnome_backend, targets_for
+        from arcon.display.model import placement_to_profile
+        journal = Journal.create(self.paths.runs, command="display")
+        ctx = self.context(self.load_profile(), journal)
+        backend = gnome_backend(ctx)
+        if backend is None:
+            self.ui.error("No GNOME session (run this from your desktop session, not over SSH/TTY).")
+            return EXIT_USAGE
+        _, monitors, logical = backend.read()
+        targets = targets_for(ctx, monitors, logical)
+        self.ui.table("Monitors", ("Identity", "Connector", "Current", "Best", "Position", "Scale", "Primary"), [
+            (t.monitor.identity, t.monitor.connector, t.monitor.current.label() if t.monitor.current else "off",
+             t.mode.label(), f"{t.placement.x},{t.placement.y}", f"{t.placement.scale:g}",
+             "yes" if t.placement.primary else "") for t in targets])
+        if self.args.what == "capture":
+            from arcon.display.model import placements_from_state
+            profile = self.load_profile()
+            profile.set("display", "monitor", [placement_to_profile(p) for p in placements_from_state(monitors, logical)])
+            path = profile.save(self.profile_path)
+            self.ui.ok(f"Current layout saved to {path}")
+        return EXIT_OK
+
     def cmd_doctor(self) -> int:
         provider = snapshot.detect(self.runner) if self.os.is_linux else None
+        hw_rows = []
+        if self.os.is_linux:
+            from arcon.hardware.linux import detect as detect_hw
+            hw = detect_hw(self.runner)
+            gpus = ", ".join(f"{g.vendor}:{g.device_id:04x}{' (open modules ok)' if g.nvidia_open_capable else ''}"
+                             for g in hw.gpus) or "none"
+            hw_rows = [("GPU", gpus), ("CPU", hw.cpu_vendor), ("RAM", f"{hw.ram_mb} MiB"),
+                       ("Root disk", {True: "HDD", False: "SSD/NVMe", None: "unknown"}[hw.root_rotational]),
+                       ("Kernels", ", ".join(hw.kernels) or "unknown"), ("Virtualization", hw.virtualization)]
         self.ui.table("ArCoN doctor", ("Item", "Value"), [
             ("ArCoN", __version__),
             ("OS", f"{self.os.name} (id={self.os.id or '-'}, family={self.os.family.value})"),
             ("Support tier", self.os.tier.value),
+            *hw_rows,
             ("Profile", str(self.profile_path)),
             ("State dir", str(self.paths.state)),
             ("Snapshot tool", provider.name if provider else "none (per-file backups)"),
@@ -211,7 +248,7 @@ class App:
         return EXIT_OK
 
 
-READ_ONLY_COMMANDS = {"doctor", "profile", "runs"}
+READ_ONLY_COMMANDS = {"doctor", "profile", "runs", "display"}
 
 
 def _is_root() -> bool:

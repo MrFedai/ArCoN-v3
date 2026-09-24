@@ -71,3 +71,10 @@ D20–D28 recorded (Arch dual-boot + NVIDIA, English + rich CLI, Flatpak fallbac
 - **Bugs found and fixed while testing:** `$USER` unset crashed chsh/gamemode (now getent/getpass); dry run created `~/.oh-my-zsh/custom/plugins`; a broken third-party apt source aborted every install (now a warning); chsh was re-planned every run because `$SHELL` is not the login shell.
 - **NOT tested:** Arch/Debian/Fedora real runs (CI Phase 7 = containers only), NVIDIA driver install, multilib, reflector, BlackArch, USBGuard, OpenSnitch, scans, firewall on a real host, Mutter display changes, Hyprland — all UNIT at most.
 - **Deviations:** none.
+
+## Phase 6 — CLI polish and migration guide
+
+- **Done:** global options accepted before or after the command; help epilog with examples; `arcon profile init` (documented template, never overwrites); README rewritten for v3 with an honest platform table; `docs/MIGRATION.md` (every v2.5 prompt → profile key/command, every intentional behaviour change with its reason); v2.5 README kept in `legacy/v2.5/`.
+- **Evidence:** 132 passed; template test checks every schema key/default; `arcon profile init` + `validate` run.
+- **NOT tested:** —
+- **Deviations:** none.

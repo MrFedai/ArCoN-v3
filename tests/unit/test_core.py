@@ -334,3 +334,24 @@ def test_cli_root_guard(monkeypatch, capsys):
     monkeypatch.delenv("ARCON_ALLOW_ROOT", raising=False)
     assert cli.main(["apply"]) == 2
     assert "normal user" in capsys.readouterr().err
+
+
+def test_profile_template_is_valid_and_complete():
+    import tomllib
+    from arcon.core.profile import SCHEMA
+    path = Path(__file__).resolve().parents[2] / "arcon" / "data" / "profile.template.toml"
+    data = tomllib.loads(path.read_text())
+    Profile.load(path)
+    for section, keys in SCHEMA.items():
+        for key, (default, _v) in keys.items():
+            if (section, key) == ("display", "monitor"):
+                continue
+            assert data[section][key] == default, f"{section}.{key}"
+
+
+def test_global_options_after_the_command():
+    from arcon.cli import _parser
+    args = _parser().parse_args(["plan", "--profile", "x.toml", "-v"])
+    assert args.command == "plan" and str(args.profile) == "x.toml" and args.verbose
+    args = _parser().parse_args(["--profile", "y.toml", "apply"])
+    assert str(args.profile) == "y.toml" and args.dry_run is False

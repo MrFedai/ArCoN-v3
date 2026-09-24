@@ -36,30 +36,54 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 EXIT_OK, EXIT_FAILED, EXIT_USAGE, EXIT_UNSUPPORTED = 0, 1, 2, 3
 
 
+EPILOG = """without a command: wizard -> plan -> one confirmation -> apply (the v2.5 flow)
+
+examples:
+  arcon plan                                   what would change (dry run)
+  arcon --profile profiles/mrfedai.toml        the owner's setup
+  arcon display capture                        save the current monitor layout
+  arcon rollback                               undo the file changes of the last run
+"""
+
+
+def _common(defaults: bool) -> argparse.ArgumentParser:
+    """Global options, accepted before or after the command."""
+    d = (lambda v: v) if defaults else (lambda v: argparse.SUPPRESS)
+    p = argparse.ArgumentParser(add_help=False)
+    p.add_argument("--profile", type=Path, default=d(None),
+                   help="profile TOML (default: ~/.config/arcon/profile.toml)")
+    p.add_argument("-n", "--dry-run", action="store_true", default=d(False),
+                   help="show and journal changes without making them")
+    p.add_argument("-y", "--yes", action="store_true", default=d(False),
+                   help="answer yes to normal confirmations (never to typed ones)")
+    p.add_argument("--keep-going", action="store_true", default=d(False),
+                   help="continue with other actions after a failure")
+    p.add_argument("-v", "--verbose", action="store_true", default=d(False))
+    return p
+
+
 def _parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="arcon", description="ArCoN — system setup and configuration toolkit")
+    p = argparse.ArgumentParser(prog="arcon", description="ArCoN — system setup and configuration toolkit",
+                                epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter,
+                                parents=[_common(True)])
     p.add_argument("--version", action="version", version=f"arcon {__version__}")
-    p.add_argument("--profile", type=Path, help="profile TOML (default: ~/.config/arcon/profile.toml)")
-    p.add_argument("-n", "--dry-run", action="store_true", help="show and journal changes without making them")
-    p.add_argument("-y", "--yes", action="store_true", help="answer yes to normal confirmations (never to typed ones)")
-    p.add_argument("--keep-going", action="store_true", help="continue with other actions after a failure")
-    p.add_argument("-v", "--verbose", action="store_true")
-    sub = p.add_subparsers(dest="command")
-    sub.add_parser("plan", help="dry run: show what would change")
-    sub.add_parser("apply", help="apply the saved profile")
-    sub.add_parser("wizard", help="answer the questions and save the profile")
-    sub.add_parser("resume", help="continue the latest unfinished run")
-    rb = sub.add_parser("rollback", help="restore files changed by a run")
+    sub = p.add_subparsers(dest="command", metavar="command")
+    common = [_common(False)]
+    sub.add_parser("plan", parents=common, help="dry run: show what would change")
+    sub.add_parser("apply", parents=common, help="apply the saved profile")
+    sub.add_parser("wizard", parents=common, help="answer the questions and save the profile")
+    sub.add_parser("resume", parents=common, help="continue the latest unfinished run")
+    rb = sub.add_parser("rollback", parents=common, help="restore files changed by a run")
     rb.add_argument("run_id", nargs="?")
-    sub.add_parser("runs", help="list previous runs")
-    pr = sub.add_parser("profile", help="show / validate the profile")
-    pr.add_argument("what", choices=("show", "path", "validate"))
-    sub.add_parser("doctor", help="show detected platform, hardware and recovery options")
-    dp = sub.add_parser("display", help="show monitors / save the current layout to the profile")
+    sub.add_parser("runs", parents=common, help="list previous runs")
+    pr = sub.add_parser("profile", parents=common, help="show / validate / create the profile")
+    pr.add_argument("what", choices=("show", "path", "validate", "init"))
+    sub.add_parser("doctor", parents=common, help="show detected platform, hardware and recovery options")
+    dp = sub.add_parser("display", parents=common, help="show monitors / save the current layout to the profile")
     dp.add_argument("what", choices=("show", "capture"))
-    df = sub.add_parser("dotfiles", help="diff deployed dotfiles / capture them back into the repo")
+    df = sub.add_parser("dotfiles", parents=common, help="diff deployed dotfiles / capture them back into the repo")
     df.add_argument("what", choices=("diff", "capture"))
-    rs = sub.add_parser("reset", help="Smart Factory Reset (backup first, typed confirmation)")
+    rs = sub.add_parser("reset", parents=common, help="Smart Factory Reset (backup first, typed confirmation)")
     rs.add_argument("--uninstall", action="store_true", help="also uninstall packages ArCoN installs")
     rs.add_argument("--gnome", action="store_true", help="also reset all GNOME settings")
     return p
@@ -208,6 +232,15 @@ class App:
     def cmd_profile(self) -> int:
         if self.args.what == "path":
             self.ui.console.print(str(self.profile_path), highlight=False, markup=False)
+            return EXIT_OK
+        if self.args.what == "init":
+            if self.profile_path.exists():
+                self.ui.error(f"{self.profile_path} already exists — not overwritten")
+                return EXIT_USAGE
+            template = Path(__file__).resolve().parent / "data" / "profile.template.toml"
+            self.profile_path.parent.mkdir(parents=True, exist_ok=True)
+            self.profile_path.write_text(template.read_text())
+            self.ui.ok(f"Profile created: {self.profile_path} (every key documented; edit, then `arcon plan`)")
             return EXIT_OK
         profile = self.load_profile()
         if self.args.what == "validate":

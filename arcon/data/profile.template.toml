@@ -1,0 +1,82 @@
+# ArCoN profile — every key is optional; the values below are the defaults.
+# Check it with `arcon profile validate`, preview with `arcon plan`.
+
+[profile]
+name = "default"
+
+[modules]                 # which parts run at all
+system = true             # full upgrade first (Arch: keyring, then -Su)
+packages = true
+gnome = true              # configs/gno.conf: dark theme, keybindings, app folders
+display = true            # best monitor modes, current layout kept
+hyprland = false          # optional desktop with ArCoN's config
+dotfiles = true           # Terminator config
+terminal = true
+shell = true
+gaming = false            # Steam, GameMode, GPU drivers from detection
+blackarch = false         # Arch only; third-party strap.sh (ONE-WAY)
+security = false          # see [security] — every item is opt-in
+optimization = true
+cleanup = true
+
+[system]
+upgrade = true
+mirrors = false           # Arch: reflector (mirrorlist backed up)
+keyring_reset = false     # Arch: delete and re-create the pacman keyring (HIGH risk)
+speedtest = false
+
+[packages]
+groups = ["essentials"]   # essentials media cyber remote privacy power ("base" is always installed)
+extra = []                # more package names; unknown names are reported, never guessed
+custom_file = ""          # e.g. "legacy/v2.5/pacs.txt" (one or more names per line, # comments)
+flatpak_fallback = true   # Flathub when the distro does not package it
+aur_helper = "yay"        # yay | paru
+
+[gnome]
+debloat = false           # remove Tour, Weather, Maps, Contacts, Music, Web
+
+[wallpaper]
+mode = "none"             # none = solid black | file
+file = ""                 # used with mode = "file"
+repo = ""                 # optional private wallpaper repository
+
+[display]
+prefer = "resolution"     # resolution | refresh — when both maxima cannot coexist
+# The layout: written by `arcon display capture`, or by hand:
+# [[display.monitor]]
+# id = "SAM Odyssey H1"   # vendor product serial, see `arcon display show`
+# position = "0,0"
+# scale = 1.0
+# primary = true
+
+[terminal]
+emulator = "terminator"   # terminator | kitty | alacritty | gnome-terminal | none
+theme = ""                # kitty/alacritty: dracula | nord | gruvbox_dark | tokyo_night
+
+[shell]
+name = "none"             # zsh | fish | bash | none
+zsh_theme = "agnoster"    # agnoster | robbyrussell | bira | powerlevel10k
+starship_preset = ""      # fish/bash: pastel-powerline | tokyo-night | pure-preset | gruvbox-rainbow | …
+
+[gaming]
+gpu = "auto"              # auto | nvidia | amd | intel | none
+
+[blackarch]
+install = "core"          # core (webapp, networking, wireless) | full | remove
+
+[security]
+tools = false             # ClamAV, rkhunter, Lynis, Firejail, nethogs, arch-audit/debsecan
+scans = false             # run the scanners, reports in the run directory
+sysctl = false
+firewall = false          # ufw (Fedora: firewalld); SSH stays reachable if sshd runs
+ssh_root_login = false    # PermitRootLogin no
+ssh_disable_password = false   # key-only; typed confirmation
+opensnitch = false
+usbguard = false          # typed confirmation
+
+[optimization]
+items = ["fstrim", "bluetooth", "zram", "ananicy"]
+
+[cleanup]
+orphans = true
+cache = "trim"            # trim (keep 2 versions) | none | purge (pacman -Scc)

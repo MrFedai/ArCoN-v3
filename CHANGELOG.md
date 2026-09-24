@@ -12,6 +12,7 @@ Complete rewrite of the 1885-line v2.5 Bash script in Python 3.11+ (`arcon`). v2
 - GPU detection (NVIDIA open modules / DKMS + headers / PRIME, AMD, Intel) — no more GPU menu.
 - Debian, Ubuntu and Fedora support through a per-distro package catalog with Flatpak fallback.
 - Package groups reorganised: base, essentials, media, cyber, remote, privacy, power.
+- One-line install: `git clone https://github.com/MrFedai/ArCoN-v3.git ~/ArCoN-v3 && ~/ArCoN-v3/setup.sh`; on Debian/Ubuntu `setup.sh` installs `python3-venv` itself when it is missing.
 
 ### Fixed (v2.5 bugs)
 - Resume never worked (log was never written).

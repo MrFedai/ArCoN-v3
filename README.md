@@ -6,14 +6,14 @@
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![Status](https://img.shields.io/badge/v3-development-orange)
 
-ArCoN v3 is a rewrite of [ArCoN v2.5](legacy/v2.5/README.md) (a 1885-line Bash script) in Python.
+ArCoN v3 is a rewrite of [ArCoN v2.5](legacy/v2.5/README.md) (a 1885-line Bash script) in Python. The working v2.5 stays at [MrFedai/ArCoN](https://github.com/MrFedai/ArCoN); this repository keeps its full history (tag `v2.5.0`).
 Every v2.5 feature is kept, fixed or explicitly marked — see [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md).
 Your dotfiles in `configs/` are deployed **unchanged** (only documented substitutions, CLAUDE.md D18).
 
 ## Quick start
 
 ```bash
-git clone https://github.com/MrFedai/ArCoN.git && cd ArCoN
+git clone https://github.com/MrFedai/ArCoN-v3.git && cd ArCoN-v3
 ./setup.sh plan        # dry run: what would change — nothing is modified
 ./setup.sh             # wizard -> plan -> one confirmation -> apply
 ```

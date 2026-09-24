@@ -60,7 +60,7 @@ If you find a strong technical reason to deviate, STOP, explain the reason and w
 7. Report facts with evidence (command + output). If something was not run, say NOT TESTED.
 
 ## Status (2026-09-24)
-Phases 1–8 done on `v3-dev` (see docs/PROGRESS.md, docs/FINAL_AUDIT.md). Next: push, CI run, native test on the owner's Arch machine (checklist in FINAL_AUDIT), then release per D27.
+Phases 1–8 done on `v3-dev` (see docs/PROGRESS.md, docs/FINAL_AUDIT.md). Repository: v3 lives in its own repo `MrFedai/ArCoN-v3` (owner decision), branch `main` = former `v3-dev`, full history and tag `v2.5.0` included; `MrFedai/ArCoN` stays the working v2.5. D27 is replaced by this. Next: push, CI run, native test on the owner's Arch machine (checklist in FINAL_AUDIT), then release per D27.
 
 ## Phase roadmap (continuous mode)
 Work through the phases without waiting for approval between them. STOP only when a decision is genuinely the owner's (a new trade-off not covered by D1–D19 or the answered decisions below). Commit once per phase (Conventional Commits). After every phase: append the phase report to `docs/PROGRESS.md` and save a git bundle as backup. Push once at the end (or whenever push access exists).

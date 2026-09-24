@@ -26,7 +26,7 @@ from arcon.recovery.journal import Journal
 from arcon.recovery.reset import CONFIGS, PROTECTED, ResetConfigs, ResetPackages
 from arcon.security.actions import SYSCTL, Firewall, SshDropIn
 from arcon.system.actions import enable_multilib
-from arcon.terminal.actions import PINS, _zshrc_edit
+from arcon.terminal.actions import PINS, ChangeShell, _zshrc_edit
 
 ARCH = OSInfo(Family.ARCH, Tier.SUPPORTED, "arch", "Arch Linux")
 UBUNTU = OSInfo(Family.DEBIAN, Tier.SUPPORTED, "ubuntu", "Ubuntu")
@@ -144,6 +144,20 @@ def test_zshrc_edit_changes_only_two_lines():
 
 def test_all_shell_repos_are_pinned():
     assert all(len(commit) == 40 for _url, commit in PINS.values())
+
+
+def test_login_shell_path_with_merged_sbin(tmp_path, monkeypatch):
+    # Arch / Fedora 42+: /usr/sbin -> bin, root's PATH has sbin first, so `which`
+    # answers the sbin path; chsh needs the /etc/shells entry (CI run 36055367756)
+    (tmp_path / "bin").mkdir()
+    (tmp_path / "bin" / "zsh").write_text("")
+    (tmp_path / "sbin").symlink_to("bin")
+    shells = f"# /etc/shells\n/bin/sh\n{tmp_path}/bin/zsh\n"
+    monkeypatch.setattr("shutil.which", lambda name: f"{tmp_path}/sbin/{name}")
+    assert ChangeShell.shell_path("zsh", shells) == f"{tmp_path}/bin/zsh"
+    monkeypatch.setattr("shutil.which", lambda name: f"{tmp_path}/bin/{name}")
+    assert ChangeShell.shell_path("zsh", shells) == f"{tmp_path}/bin/zsh"   # listed as found
+    assert ChangeShell.shell_path("fish", shells) is None                   # not listed at all
 
 
 # ---- security ---------------------------------------------------------------------------

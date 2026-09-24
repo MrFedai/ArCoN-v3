@@ -208,12 +208,30 @@ class ChangeShell(Action):
             return []
         return [Change("setting", f"login shell -> {name}", "chsh")]
 
+    @staticmethod
+    def shell_path(name: str, shells_text: str) -> str | None:
+        """The /etc/shells entry for `name` — chsh accepts only listed paths.
+
+        With /usr/sbin merged into /usr/bin (Arch, Fedora 42+) `which` can answer
+        /usr/sbin/zsh, which is the same file as the listed /usr/bin/zsh but not
+        listed itself; match entries by the file they point to."""
+        listed = [line.strip() for line in shells_text.splitlines() if line.strip().startswith("/")]
+        found = shutil.which(name)
+        if found in listed:
+            return found
+        target = os.path.realpath(found) if found else None
+        for entry in listed:
+            if os.path.basename(entry) == name and (target is None or os.path.realpath(entry) == target):
+                return entry
+        return None
+
     def apply(self, ctx):
         name = ctx.profile.get("shell", "name")
-        path = shutil.which(name) or f"/usr/bin/{name}"
-        shells = read_text(Path("/etc/shells")) or ""
-        if path not in shells.split() and not ctx.dry_run:
-            raise RuntimeError(f"{path} is not listed in /etc/shells")
+        path = self.shell_path(name, read_text(Path("/etc/shells")) or "")
+        if path is None:
+            if not ctx.dry_run:
+                raise RuntimeError(f"{name} is not listed in /etc/shells")
+            path = f"/usr/bin/{name}"
         ctx.journal.write("login_shell", user=current_user(), previous=self.login_shell(ctx), new=path)
         ctx.runner.run(["chsh", "-s", path, current_user()], sudo=True)
 

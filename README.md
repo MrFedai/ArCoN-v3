@@ -94,7 +94,7 @@ The wizard saves your answers to `~/.config/arcon/profile.toml` and offers to re
 | Platform | Status |
 |---|---|
 | Arch Linux | full scope; unit tested; container CI (real run) under investigation; native test on the owner's machine pending |
-| Debian / Ubuntu | full scope (one provider); Ubuntu 24.04: real `apply` + `rollback` pass (packages, dconf, dotfiles, shell); one-line install verified on a fresh minimal Ubuntu 24.04 |
+| Debian / Ubuntu | full scope (one provider); real `apply` + `rollback` pass in container CI on debian:stable and ubuntu:24.04 (packages, dconf, dotfiles, shell); one-line install verified on a fresh minimal Ubuntu 24.04 |
 | Fedora | full scope; unit tested; container CI (real run) under investigation |
 | Derivatives (EndeavourOS, CachyOS, Mint, Nobara, …) | run as their parent family, marked *experimental* |
 | Windows, macOS | interfaces only — ArCoN v3.0 changes nothing there |

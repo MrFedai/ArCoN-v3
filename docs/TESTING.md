@@ -40,15 +40,15 @@ Golden files: `tests/golden/v25/*.json`. Regenerate only deliberately: `python t
 
 | Job | Runs | Status |
 |---|---|---|
-| lint | ShellCheck, `compileall` | PASS (run 35993001306, 2026-09-24) |
-| unit | full pytest as user, characterization as root (Arch scenarios) | PASS (run 35993001306) |
-| distro × {archlinux, debian:stable, ubuntu:24.04, fedora} | catalog verification per distro, dry run of `profiles/mrfedai.toml`, real apply + rollback | run 35993001306: catalog + dry run PASS on all four; **real apply + rollback FAIL on all four** — see below |
+| lint | ShellCheck, `compileall` | PASS (runs 35993001306, 36054621202) |
+| unit | full pytest as user, characterization as root (Arch scenarios) | PASS in run 35993001306; run 36054621202 did not start: `astral-sh/setup-uv@v10` does not exist (setup-uv has no major tags since v8) — now pinned to `v10.2.0` |
+| distro × {archlinux, debian:stable, ubuntu:24.04, fedora} | catalog verification per distro, dry run of `profiles/mrfedai.toml`, real apply + rollback | run 36054621202: **debian:stable and ubuntu:24.04 PASS** (incl. real apply + rollback); archlinux and fedora: catalog + dry run PASS, **real apply + rollback FAIL** — see below |
 
 Expected on Arch in a root container: the AUR actions fail (makepkg refuses root) — the test allows exactly those two, also on the idempotency re-run (judged by the journal, not by console text).
 
 **First CI run (35993001306) — real apply + rollback:**
-- debian:stable, ubuntu:24.04 — cause found: the images have no `dconf-service` (`dconf-cli` does not pull it in), so every dconf write failed with `ServiceUnknown: ca.desrt.dconf`. A desktop always has it; the workflow now installs it. Reproduced and fix verified in a fresh Ubuntu 24.04 minbase rootfs (debootstrap + chroot, the workflow's exact commands) — not in Docker (Docker Hub blocked here).
-- archlinux, fedora — cause NOT FOUND yet: step logs need a GitHub sign-in and the images cannot be pulled here. Known and fixed: the idempotency check could never pass on Arch as root (it looked for the id `packages.aur` in console output, which only shows titles). Failed real runs now upload the ArCoN run logs (`arcon-runs-*` artifact).
+- debian:stable, ubuntu:24.04 — cause found: the images have no `dconf-service` (`dconf-cli` does not pull it in), so every dconf write failed with `ServiceUnknown: ca.desrt.dconf`. A desktop always has it; the workflow now installs it — confirmed green in CI run 36054621202. Reproduced and fix verified in a fresh Ubuntu 24.04 minbase rootfs (debootstrap + chroot, the workflow's exact commands) — not in Docker (Docker Hub blocked here).
+- archlinux, fedora — cause NOT FOUND yet: step logs need a GitHub sign-in and the images cannot be pulled here. Known and fixed: the idempotency check could never pass on Arch as root (it looked for the id `packages.aur` in console output, which only shows titles). Failed real runs now upload the ArCoN run logs (`arcon-runs-*` artifact). Still failing in run 36054621202 — logs in artifacts `arcon-runs-0` (archlinux) and `arcon-runs-3` (fedora).
 
 **One-line install** (`git clone … ~/ArCoN-v3 && ~/ArCoN-v3/setup.sh`): run as a normal sudo user on a fresh Ubuntu 24.04 minbase rootfs (debootstrap + chroot, no python3): `setup.sh` installed python3 + python3-venv, uv, and started `arcon` (`--version`, `doctor`, `plan` OK). Arch/Fedora path (uv from pacman/dnf): NOT TESTED.
 

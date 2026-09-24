@@ -78,3 +78,10 @@ D20–D28 recorded (Arch dual-boot + NVIDIA, English + rich CLI, Flatpak fallbac
 - **Evidence:** 132 passed; template test checks every schema key/default; `arcon profile init` + `validate` run.
 - **NOT tested:** —
 - **Deviations:** none.
+
+## Phase 7 — CI and test-status report
+
+- **Done:** `.github/workflows/ci.yml` — lint (ShellCheck, compileall), unit (pytest as user + characterization as root for the Arch scenarios), distro matrix (archlinux, debian:stable, ubuntu:24.04, fedora): catalog verification per distro (artifact), dry run of the owner profile, real apply + rollback. The real-run test is distro-neutral now (package check through the provider; on Arch as root only the two AUR actions may fail — makepkg refuses root). `docs/TESTING.md`: level-by-level status.
+- **Evidence:** workflow parses (PyYAML), ShellCheck/compileall clean locally, 132 passed; real-run test passes again on Ubuntu 24.04 after the generalisation.
+- **NOT tested:** the workflow itself has **not run** — it needs the branch on GitHub. Docker Hub is blocked in this environment, so no local container matrix either.
+- **Deviations:** none.

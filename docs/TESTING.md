@@ -7,6 +7,8 @@ Run everything: `uv run pytest` (Python ≥ 3.11). Labels follow CLAUDE.md rule 
 | `tests/test_dotfiles_golden.py` | owner dotfiles unchanged (sha256 manifest), owner settings present, v3 golden files obey D18, D18 checker rejects forbidden edits | Python | UNIT TESTED |
 | same, `@pytest.mark.dconf` | v2.5 and v3 `gno.conf` load into a real, throw-away dconf database and read back the owner settings + black wallpaper | `dconf`, `dbus-run-session` | INTEGRATION TESTED (container) |
 | `tests/characterization/` | what ArCoN **v2.5** does: package lists, commands issued, files written, exact dconf input — bugs included | bash, git; Arch scenarios need root + `unshare` | INTEGRATION TESTED (container, mocked tools) |
+| `tests/unit/` | v3 core, detection, packages, display (fake Mutter), every feature module with `FakeRunner` | Python | UNIT TESTED |
+| `tests/integration/test_real_run.py` | REAL `arcon apply` (packages, dconf, dotfiles, Oh-My-Zsh, chsh) → idempotent 2nd run → `arcon rollback` | `ARCON_REAL_RUN=1`, disposable container/VM, dbus, dconf, sudo | INTEGRATION TESTED (Ubuntu 24.04 container, run by hand) |
 
 Nothing here validates a real GNOME session, real package installs, GPU, monitors or Hyprland: those are NOT TESTED until VM/native runs.
 
@@ -33,3 +35,22 @@ Golden files: `tests/golden/v25/*.json`. Regenerate only deliberately: `python t
 | `arcon/dotfiles/rules.py` | D18 checker, used by the deploy/verify step and the tests |
 
 `hyprland.conf` v3 golden is deferred to Phase 4 (depends on detected monitors).
+
+## CI (`.github/workflows/ci.yml`)
+
+| Job | Runs | Status |
+|---|---|---|
+| lint | ShellCheck, `compileall` | configured — **NOT RUN yet** (branch not pushed with the workflow) |
+| unit | full pytest as user, characterization as root (Arch scenarios) | configured — NOT RUN yet |
+| distro × {archlinux, debian:stable, ubuntu:24.04, fedora} | catalog verification per distro, dry run of `profiles/mrfedai.toml`, real apply + rollback | configured — NOT RUN yet |
+
+Expected on Arch in a root container: the AUR actions fail (makepkg refuses root) — the test allows exactly those two.
+
+## Test status by level (2026-09-24)
+
+| Level | What actually ran |
+|---|---|
+| UNIT | 132 tests pass (`uv run pytest`; 1 opt-in real-run test skipped) |
+| INTEGRATION (container) | characterization of v2.5 (Ubuntu + Arch via mount namespace, mocked tools); real apply/rollback on Ubuntu 24.04; real dconf load; catalog check on Ubuntu 24.04 |
+| VM | none |
+| NATIVE | none — first native run: the owner's Arch machine (see docs/FINAL_AUDIT.md, "native checklist") |

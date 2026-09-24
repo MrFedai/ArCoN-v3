@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [v3-dev, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y shellcheck
+      - run: shellcheck setup.sh tests/characterization/run_v25.sh tests/characterization/mocks/_mock
+      - run: python3 -m compileall -q arcon scripts tests
+
+  unit:
+    # unit + golden + dconf + characterization of v2.5 (Arch scenarios need root + unshare)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # the characterization harness reads tag v2.5.0
+      - run: git fetch --tags --force
+      - uses: astral-sh/setup-uv@v6
+      - run: sudo apt-get install -y dconf-cli dbus
+      - name: pytest (as user)
+        run: uv run pytest -ra
+      - name: characterization incl. Arch scenarios (root)
+        run: sudo -E env "PATH=$PATH" "$(command -v uv)" run pytest -ra tests/characterization
+
+  distro:
+    # Real `arcon apply` + `rollback` in throw-away containers, catalog verification,
+    # dry run of the owner's profile. Containers do NOT validate GPU/monitors/desktop.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ["archlinux:latest", "debian:stable", "ubuntu:24.04", "fedora:latest"]
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: base tools
+        run: |
+          case "${{ matrix.image }}" in
+            archlinux*) pacman -Syu --noconfirm --needed git python python-pip sudo dconf dbus zsh ;;
+            debian*|ubuntu*) apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git python3 python3-venv python3-pip sudo dconf-cli dbus zsh ;;
+            fedora*) dnf install -y git python3 python3-pip sudo dconf dbus-daemon zsh util-linux-user ;;
+          esac
+      - uses: actions/checkout@v4
+      - name: install uv
+        run: python3 -m venv /opt/uv && /opt/uv/bin/pip install -q uv && ln -s /opt/uv/bin/uv /usr/local/bin/uv
+      - name: verify package catalog on this distro
+        run: python3 scripts/verify_catalog.py | tee catalog-${{ strategy.job-index }}.md
+        continue-on-error: true   # MISSING entries are reported, not fatal: the runtime falls back
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalog-${{ strategy.job-index }}
+          path: catalog-*.md
+      - name: dry run of the owner profile
+        run: ARCON_ALLOW_ROOT=1 uv run arcon --profile profiles/mrfedai.toml plan
+      - name: real apply + rollback (disposable container)
+        run: ARCON_REAL_RUN=1 uv run pytest -ra tests/integration

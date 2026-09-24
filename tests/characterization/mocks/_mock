@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Recording test double used ONLY by tests/characterization/run_v25.sh.
+# Never executes the real tool. Every call is appended to $ARCON_LOG as
+# "<tool> <args>". Stdin of `dconf load` / `sudo tee` is saved to $ARCON_CAPTURE.
+tool="$(basename "$0")"
+printf '%s %s\n' "$tool" "$*" >> "${ARCON_LOG:?}"
+cap="${ARCON_CAPTURE:?}"; mkdir -p "$cap"
+n=$(find "$cap" -mindepth 1 -maxdepth 1 | wc -l)
+case "$tool" in
+  sudo)
+    # record only; a few read-only sub-commands answer like the real tool
+    while [[ "${1:-}" == -* ]]; do shift; done
+    case "${1:-}" in
+      tee) cat > "$cap/$(printf %03d "$n")-sudo-tee-$(basename "${!#}")" ;;
+      pacman) [[ "${2:-}" == "-Si" ]] && exec "$(dirname "$0")/pacman" "${@:2}" ;;
+    esac
+    exit 0 ;;
+  dconf)
+    case "${1:-}" in
+      load) cat > "$cap/$(printf %03d "$n")-dconf-load.ini" ;;
+      read|dump) : ;;
+    esac
+    exit 0 ;;
+  pacman)
+    case "${1:-}" in
+      -Si) # official = in $ARCON_OFFICIAL list
+           if grep -qxF -- "${2:-}" "${ARCON_OFFICIAL:-/dev/null}"; then
+             printf 'Name            : %s\nDownload Size   : 1.00 MiB\n' "$2"; exit 0
+           fi; exit 1 ;;
+      -Qi|-Qs|-Q) exit 1 ;;   # nothing installed
+      -Qtdq|-Qdtq) exit 0 ;;  # no orphans
+    esac
+    exit 0 ;;
+  dpkg) exit 1 ;;             # nothing installed
+  systemctl) [[ " $* " == *" is-active "* || " $* " == *" is-enabled "* ]] && exit 3; exit 0 ;;
+  fc-list|tput|clear|sleep) exit 0 ;;
+  *) exit 0 ;;
+esac

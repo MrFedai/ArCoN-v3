@@ -1,0 +1,30 @@
+# main menu: install
+1
+# Update Base System
+n
+# Apply GNOME Settings
+y
+# Remove GNOME Bloatware
+n
+# Enable Gaming Mode
+n
+# Start Package Installation Module
+n
+# BlackArch manager: 4) Skip
+4
+# Install Hyprland Environment
+y
+# theme: 5) Skip Theme (ArCoN default configs)
+5
+# Restore Configs
+y
+# Configure Terminal
+y
+1
+4
+# Security
+n
+# leftovers
+n
+# Reboot
+n

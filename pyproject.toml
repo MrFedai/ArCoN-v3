@@ -1,0 +1,18 @@
+[project]
+name = "arcon"
+version = "3.0.0.dev0"
+description = "ArCoN — system setup and configuration toolkit (v3 rewrite in Python)"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+# The `arcon` package does not exist yet (Phase 3); only the test suite runs.
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

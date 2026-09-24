@@ -1,0 +1,34 @@
+# main menu: install
+1
+# Update Base System
+n
+# Apply GNOME Settings (no -> gaming is not offered, v2.5 coupling)
+n
+# Start Package Installation Module
+y
+# Media & Office
+y
+# Cyber Security
+y
+# Remote Support
+y
+# Power Tools
+y
+# pacs.txt
+y
+# Proceed with installation
+y
+# BlackArch manager: 4) Skip
+4
+# Install Hyprland Environment
+n
+# Restore Configs
+n
+# Configure Terminal
+n
+# Security
+n
+# leftovers
+n
+# Reboot
+n

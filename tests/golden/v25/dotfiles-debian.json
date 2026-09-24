@@ -1,0 +1,34 @@
+{
+  "scenario": "dotfiles-debian",
+  "exit_code": 0,
+  "commands": [
+    "sudo -v",
+    "sudo apt-get update",
+    "sudo apt-get install -y adw-gtk-theme wl-clipboard",
+    "dconf reset -f /org/gnome/desktop/app-folders/",
+    "dconf load /",
+    "sudo apt-get install -y terminator",
+    "fc-list ",
+    "pacman -Qi hyprland",
+    "systemctl is-active --quiet opensnitchd",
+    "systemctl is-active --quiet usbguard",
+    "pacman -Qi gamemode"
+  ],
+  "files": {
+    ".config/terminator/config": "9e0fbe030f1da5578e47fa585be7c9236a6bf49603e9bbdfcb9347a577c9459e",
+    "Pictures/wallp/B.jpg": "7e33b2f0aefe06bf9f2a8c47dddb8866c1c0f8626302e567536ee6da57e1d15a",
+    "Pictures/wallp/BladeRun.jpg": "0b8cd7b061b15dac098bd463ba0f1417d6ddff6d60781193016f8763ffdc85a3",
+    "Pictures/wallp/Jinx2.jpg": "5ff539bfab364720408873a49f6a8c7db0bfae2724ed685fde80ddcc4181a029",
+    "Pictures/wallp/Katana.jpg": "89626a0d4c8ecceb2dc7af36b66f98f7ec73edeb34806476f12aac720c800754",
+    "Pictures/wallp/Khabib.jpg": "6d8e9e15f0797d7bff26c5d9bc27d7d8ba204310f5cbcb4875a79256066bd41e",
+    "Pictures/wallp/Rmf.jpg": "348d270a25fff54f46739b4b5b27b4f067d9cbef2e52f9fbbd7fbc23ee8f1955",
+    "Pictures/wallp/Scarlet.jpg": "23d206635c2a2417915728374010fefa4a81bb92673c7a0ddffdecc17b233fbc",
+    "Pictures/wallp/Throne.jpg": "015f12d38f6102b591eaa6da9681523a36a3141896ea7f3f204ed47fb5ffaf1e",
+    "Pictures/wallp/and_V1.jpg": "8be607b44e19d19b69ee34b374619755cc5ff59dca305c978c005efaacf71e00",
+    "Pictures/wallp/and_V2.jpg": "4076aece1854dae2ee19079024a04531d57eeacc3c4e23e275e9a3e7c66dcbe2",
+    "Pictures/wallp/jinx.jpg": "88edb87b1efc2b75ac9dbfd70f956704747ea613528c970d4f2adcc5698dcf2b"
+  },
+  "captures": {
+    "000-dconf-load.ini": "5605766cf9c35e55c17c27e42c88c1319a36dab1ac639288a16ce0840ef6687a"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "_comment": "Owner settings that must survive every ArCoN version unchanged (CLAUDE.md D8). dconf values are in `dconf read` format.",
+  "dconf": {
+    "/org/gnome/desktop/interface/color-scheme": "'prefer-dark'",
+    "/org/gnome/desktop/interface/gtk-theme": "'adw-gtk3-dark'",
+    "/org/gnome/desktop/interface/icon-theme": "'Adwaita'",
+    "/org/gnome/desktop/interface/font-name": "'Adwaita Sans 11'",
+    "/org/gnome/desktop/interface/monospace-font-name": "'Adwaita Mono 11'",
+    "/org/gnome/desktop/interface/enable-animations": "false",
+    "/org/gnome/desktop/interface/enable-hot-corners": "false",
+    "/org/gnome/desktop/input-sources/sources": "[('xkb', 'us')]",
+    "/org/gnome/desktop/background/primary-color": "'#000000000000'",
+    "/org/gnome/settings-daemon/plugins/color/night-light-enabled": "true",
+    "/org/gnome/settings-daemon/plugins/color/night-light-temperature": "uint32 3700",
+    "/org/gnome/desktop/wm/keybindings/close": "['<Alt>w']",
+    "/org/gnome/desktop/wm/keybindings/switch-windows": "['<Alt>Tab']",
+    "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/binding": "'<Alt>Return'",
+    "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command": "'terminator'",
+    "/org/gnome/shell/keybindings/show-screenshot-ui": "['<Alt>t']"
+  },
+  "dconf_v3_wallpaper_default": {
+    "/org/gnome/desktop/background/picture-uri": "''",
+    "/org/gnome/desktop/background/picture-uri-dark": "''",
+    "/org/gnome/desktop/background/picture-options": "'none'",
+    "/org/gnome/desktop/screensaver/picture-uri": "''",
+    "/org/gnome/desktop/screensaver/picture-options": "'none'"
+  },
+  "terminator_default_profile": {
+    "background_color": "\"#241f31\"",
+    "background_darkness": "0.56",
+    "background_type": "transparent",
+    "font": "Adwaita Mono 10",
+    "foreground_color": "\"#ffffff\"",
+    "cursor_shape": "underline",
+    "palette": "\"#000000:#3584e4:#e01b24:#ff7800:#26a269:#1a5fb4:#1a5fb4:#dc8add:#000000:#9a9996:#e01b24:#fce94f:#57e389:#99c1f1:#99c1f1:#613583\""
+  }
+}

@@ -90,7 +90,7 @@ Entry point: `./setup.sh` run as the normal user from the repo root (relative pa
 | F05 | Live-USB detection | 61-74 | — | — | **no** (commented) |
 | F06 | OS detection (`. /etc/os-release`) | 77-84 | always | — | arch/debian/ubuntu |
 | F07 | package-manager selection | 86-96 | always | F06 | yes |
-| F08 | package groups (78 names) | 102-135 | data | — | Arch names only |
+| F08 | package groups (76 names, verified Phase 2) | 102-135 | data | — | Arch names only |
 | F09 | main menu install / reset / exit | 139-305 | `read -p` | — | yes |
 | F10 | Smart Factory Reset | 157-296 | menu 2 | F08 | partially (#9) |
 | F11 | resume | 308-325 | if log exists | — | **no** (#4) |
@@ -190,7 +190,7 @@ No flags, no env vars. Prompts in execution order (★ = mid-install, i.e. after
 | package groups | pacman/AUR | same Arch names via apt → most fail | — |
 | security tools / summary / cleanup | pacman | **pacman called anyway** | — |
 
-Arch/AUR-only names in groups (need per-distro mapping; source per distro = UNCLEAR until catalog re-verification): `google-chrome`, `localsend-bin`, `code`, `riseup-vpn`, `planify`, `libreoffice-fresh`, `losslesscut-bin`, `upscayl-bin`, `spotify`, `metasploit`, `burpsuite`, `exploitdb`, `wireshark-qt`, `anydesk-bin`, `rustdesk-bin`, `proton-vpn-gtk-app`, `qemu-desktop`, `ananicy-cpp`, `pinokio`, `stirling-pdf`, `devtoys-bin`, `clapgrep`, `metadata-cleaner`, `switcheroo`, `converseen`. The `v3.0` branch has a per-distro table for all 78 names (`data/packages.catalog`) — reusable after re-verification (D17).
+Arch/AUR-only names in groups (need per-distro mapping; source per distro = UNCLEAR until catalog re-verification): `google-chrome`, `localsend-bin`, `code`, `riseup-vpn`, `planify`, `libreoffice-fresh`, `losslesscut-bin`, `upscayl-bin`, `spotify`, `metasploit`, `burpsuite`, `exploitdb`, `wireshark-qt`, `anydesk-bin`, `rustdesk-bin`, `proton-vpn-gtk-app`, `qemu-desktop`, `ananicy-cpp`, `pinokio`, `stirling-pdf`, `devtoys-bin`, `clapgrep`, `metadata-cleaner`, `switcheroo`, `converseen`. The `v3.0` branch has a per-distro table (`data/packages.catalog`, claims 78 names; v2.5 groups contain 76 — see tests/golden/v25/packages.json) — reusable after re-verification (D17).
 
 ## 7. Dependencies and network resources
 
@@ -321,3 +321,12 @@ Written to `docs/FEATURE_MATRIX.md`.
 | C-6 | Security scan / hardening scope for v3.0 undecided | open question |
 | C-7 | Wallpaper licensing | open question |
 | C-8 | Package catalog from `v3.0` claims verification against official indexes but the report file is missing — needs re-verification before reuse | D17 |
+
+### 15.1 Resolutions (owner, 2026-09-24)
+
+| # | Resolution |
+|---|---|
+| C-2 | Default wallpaper = none → solid black (D18) |
+| C-3 | Ax-Shell absent → `hyprlock.conf` sources `arcon-colors.conf` (D18) |
+| C-4 | `monitor=` lines become one generated block; rest untouched (D18) |
+| C-5 | Factory reset kept, restricted (D19) |

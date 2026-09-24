@@ -1,0 +1,24 @@
+# main menu: install
+1
+# Update Base System
+n
+# Apply GNOME Settings
+y
+# Remove GNOME Bloatware
+n
+# Start Package Installation Module
+n
+# Restore Configs (Terminator, Wallpapers)
+y
+# Configure Terminal Emulator & Shell Environment
+y
+# terminal: 1) Terminator
+1
+# shell: 4) Skip
+4
+# Apply Security & System Optimizations
+n
+# remove leftovers
+n
+# Reboot
+n

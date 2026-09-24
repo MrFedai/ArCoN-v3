@@ -15,16 +15,16 @@ Source of feature IDs: `docs/AUDIT.md` §2. Update this file in every phase.
 | F05 | Live-USB detection | core/preflight.py | fix (was commented out) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F06 | OS detection | platform/detect.py | fix (parse, don't source) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F07 | package-manager selection | package/registry.py | replace | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F08 | package groups (78) | data/packages.toml | replace (per-distro names) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F08 | package groups (76) | data/packages.toml | replace (per-distro names) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F09 | main menu | cli.py / core/wizard.py | replace (D14) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F10 | Smart Factory Reset | recovery/reset.py | fix (C-5 open) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F10 | Smart Factory Reset | recovery/reset.py | fix (D19: explicit paths, protected list, verified backup) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F11 | resume | recovery/journal.py | fix (never worked) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F12 | GPG / keyring reset | package/pacman.py | fix (opt-in reset) | no | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F13 | reflector mirror benchmark | package/pacman.py | keep + backup | yes | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F14 | speed test | core/preflight.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F15 | yay-bin build | package/aur.py | keep (temp dir) | yes | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F16 | deps + system upgrade | package/* | fix (no partial upgrade) | no | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F17 | GNOME settings (gno.conf) | desktop/gnome.py + dotfiles/deploy.py | keep (D8 byte-identical; C-2) | yes (dconf dump) | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | N-A | N-A |
+| F17 | GNOME settings (gno.conf) | desktop/gnome.py + dotfiles/deploy.py | keep (D8; D18 default wallpaper = solid black) | yes (dconf dump) | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | N-A | N-A |
 | F18 | GNOME debloat | desktop/gnome.py | keep | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | N-A | N-A |
 | F19 | Gaming Mode + GPU drivers | gaming/* + hardware/gpu.py | fix (decouple from GNOME, detect GPU) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F20 | package engine (preview, pacs.txt, AUR split) | package/* | keep (batch install) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |

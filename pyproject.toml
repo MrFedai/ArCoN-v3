@@ -2,16 +2,26 @@
 name = "arcon"
 version = "3.0.0.dev0"
 description = "ArCoN — system setup and configuration toolkit (v3 rewrite in Python)"
+readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-dependencies = []
+dependencies = [
+    "rich>=13",       # coloured CLI: tables, prompts, progress (D21)
+    "tomlkit>=0.12",  # TOML writer that keeps comments/order of hand-edited profiles (D21)
+]
+
+[project.scripts]
+arcon = "arcon.cli:main"
 
 [dependency-groups]
 dev = ["pytest>=8"]
 
-[tool.uv]
-# The `arcon` package does not exist yet (Phase 3); only the test suite runs.
-package = false
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["arcon"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

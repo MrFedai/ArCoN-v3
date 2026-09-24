@@ -1,0 +1,47 @@
+# ArCoN profile of the owner (CLAUDE.md D26, D28).
+# Use it with:  ./setup.sh --profile profiles/mrfedai.toml
+# Every key is optional; missing keys use ArCoN defaults (`arcon profile show`).
+
+[profile]
+name = "mrfedai"
+
+[modules]
+packages = true
+gnome = true          # dark theme, keybindings, app folders from configs/gno.conf
+display = true        # detect monitors, best mode, keep my layout
+hyprland = false      # optional desktop, not used any more
+dotfiles = true       # Terminator config
+terminal = true
+shell = true
+gaming = false        # selectable in the wizard (NVIDIA path)
+blackarch = false
+security = false
+optimization = true
+cleanup = true
+
+[packages]
+groups = ["essentials", "media", "cyber"]   # "base" is always installed
+extra = []
+flatpak_fallback = true
+aur_helper = "yay"
+
+[gnome]
+debloat = false
+
+[wallpaper]
+mode = "none"         # solid black (D18)
+repo = "https://github.com/MrFedai/ArCoN-wallpapers.git"   # private, optional (D25)
+
+[display]
+prefer = "resolution" # when max resolution and max refresh cannot coexist
+
+[terminal]
+emulator = "terminator"
+
+[shell]
+name = "zsh"
+zsh_theme = "agnoster"
+
+[cleanup]
+orphans = true
+cache = "trim"        # keep the last versions (no pacman -Scc)

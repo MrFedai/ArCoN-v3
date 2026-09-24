@@ -4,7 +4,7 @@ Source of feature IDs: `docs/AUDIT.md` §2. Update this file in every phase.
 
 **Action:** keep (same intent/behaviour) · replace (same intent, different mechanism) · fix (v2.5 behaviour is a bug/unsafe; not ported as-is without owner approval) · N-A (with reason) · new
 **Reversible:** yes · partial · no · ONE-WAY (third-party code, D16)
-**Status values:** NOT MIGRATED · MIGRATED (+ test label: UNIT / INTEGRATION / VM / NATIVE TESTED, or NOT TESTED)
+**Status values:** NOT MIGRATED · MIGRATED (label) where label = UNIT / INTEGRATION / VM / NATIVE — the highest level actually run. Core items are distro-independent, so all Linux columns carry the same label.
 
 | ID | Feature | Target module | Action | Reversible | Arch | Debian | Ubuntu | Fedora | Windows | macOS |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -13,12 +13,12 @@ Source of feature IDs: `docs/AUDIT.md` §2. Update this file in every phase.
 | F03 | disk ≥ 10 GB | core/preflight.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F04 | sudo check | core/preflight.py + core/runner.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F05 | Live-USB detection | core/preflight.py | fix (was commented out) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F06 | OS detection | platform/detect.py | fix (parse, don't source) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F06 | OS detection | platform/detect.py | fix (parse, don't source) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | F07 | package-manager selection | package/registry.py | replace | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F08 | package groups (76 → 7 groups, 70 kept, 6 removed: D28) | data/packages.toml | replace (per-distro names) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F09 | main menu | cli.py / core/wizard.py | replace (D14) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F09 | main menu | cli.py / core/wizard.py | replace (D14) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | F10 | Smart Factory Reset | recovery/reset.py | fix (D19: explicit paths, protected list, verified backup) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F11 | resume | recovery/journal.py | fix (never worked) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F11 | resume | recovery/journal.py | fix (never worked) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | F12 | GPG / keyring reset | package/pacman.py | fix (opt-in reset) | no | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F13 | reflector mirror benchmark | package/pacman.py | keep + backup | yes | NOT MIGRATED | N-A | N-A | N-A | N-A | N-A |
 | F14 | speed test | core/preflight.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
@@ -38,11 +38,11 @@ Source of feature IDs: `docs/AUDIT.md` §2. Update this file in every phase.
 | F28 | security scans | security/scan.py | keep (scope C-6) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F29 | hardening sysctl + SSH | security/hardening.py | fix (drop-in + sshd -t) | yes | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F30 | Hardened Mode (OpenSnitch, USBGuard) | security/hardened_mode.py | fix (decouple from F29) | yes | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F31 | final summary | core/report.py | fix (from journal) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F31 | final summary | core/report.py | fix (from journal) | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
 | F32 | cleanup (orphans, cache) | optimization/cleanup.py | fix (no -Scc default) | no | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F33 | reboot prompt | core/reboot.py | keep | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | N1 | monitor mode detection + layout (D13) | display/* | new | yes | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | N2 | dotfile capture / diff (D10) | dotfiles/capture.py, dotfiles/diff.py | new | yes | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| N3 | wizard → summary → single confirm, saved answers (D14) | core/wizard.py, core/profile.py | new | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| N4 | dry-run for every action | core/runner.py | new | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| N5 | rollback (snapshot / file backup) | recovery/* | new (D6) | — | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| N3 | wizard → summary → single confirm, saved answers (D14) | core/wizard.py, core/profile.py | new | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
+| N4 | dry-run for every action | core/runner.py | new | n/a | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |
+| N5 | rollback (snapshot / file backup) | recovery/* | new (D6) | — | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | MIGRATED (UNIT) | stub | stub |

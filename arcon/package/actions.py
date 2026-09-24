@@ -31,7 +31,8 @@ def resolution(ctx: Context) -> Resolution:
                 extra += read_custom_file(path)
             else:
                 ctx.ui.warn(f"custom package file not found: {path}")
-        ids = ctx.facts.get("package_ids", [])       # packages requested by other modules
+        extra += ctx.facts.get("package_names", [])  # raw names requested by other modules (e.g. kernel headers)
+        ids = ctx.facts.get("package_ids", [])       # catalog ids requested by other modules
         ctx.facts["packages"] = resolve(ctx.os, ctx.runner, wanted_entries(p.get("packages", "groups"), ids),
                                         extra, p.get("packages", "flatpak_fallback"), p.get("packages", "aur_helper"))
     return ctx.facts["packages"]
@@ -41,12 +42,15 @@ class InstallNative(Action):
     id, title, risk, reversible = "packages.native", "Install packages from the distro repositories", Risk.LOW, Reversible.PARTIAL
 
     def plan(self, ctx):
-        return [Change("package", n, "repo") for n in resolution(ctx).native]
+        res = resolution(ctx)
+        for item in res.unavailable:
+            ctx.ui.warn(f"not available, skipped: {item}")
+        return [Change("package", n, "repo") for n in res.native]
 
     def apply(self, ctx):
         pm = native_for(ctx.os, ctx.runner)
-        if isinstance(pm, Apt):
-            pm.refresh()
+        if isinstance(pm, Apt) and not pm.refresh():
+            ctx.ui.warn("apt-get update reported errors (a repository failed) — continuing with the indexes that updated")
         pm.install(resolution(ctx).native)
         ctx.journal.write("packages_installed", source=pm.name, names=resolution(ctx).native)
 
@@ -137,9 +141,13 @@ class InstallFlatpak(Action):
         return Flatpak(ctx.runner).installed(wanted) == set(wanted)
 
 
+def request(ctx: Context, ids: list[str] = (), names: list[str] = ()) -> None:
+    """Other modules ask for packages; they are installed by the packages module
+    in the same transactions (call from a module's build(), before planning)."""
+    ctx.facts.setdefault("package_ids", []).extend(i for i in ids if i not in ctx.facts["package_ids"])
+    ctx.facts.setdefault("package_names", []).extend(n for n in names if n not in ctx.facts["package_names"])
+
+
 @register("packages", "Packages", order=20)
 def build(ctx: Context) -> list[Action]:
-    res = resolution(ctx)
-    for item in res.unavailable:
-        ctx.ui.warn(f"not available, skipped: {item}")
     return [InstallNative(), InstallAurHelper(), InstallAur(), SetupFlathub(), InstallFlatpak()]

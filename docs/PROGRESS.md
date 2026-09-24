@@ -47,4 +47,27 @@ D20–D28 recorded (Arch dual-boot + NVIDIA, English + rich CLI, Flatpak fallbac
 - **Evidence:** `uv run pytest` → 105 passed (23 new). Ubuntu 24.04 container: `verify_catalog.py` 81 ok / 7 missing (handled at runtime); `arcon --profile profiles/mrfedai.toml plan` resolved against the real apt index (28 repo packages, Flatpak fallback for 11, 5 reported unavailable).
 - **NOT tested:** real Mutter D-Bus (no GNOME session here) — the GNOME backend is UNIT TESTED against a fake Mutter only; Hyprland `desc:` matching on real Hyprland; Arch/Debian/Fedora package queries (CI, Phase 7); Flathub ids (flathub.org unreachable); AUR helper build.
 - **Risks:** Mutter's API details (`ApplyMonitorsConfig` signature, variant layout) are implemented from the documented interface, not exercised against a live session — first native run must use `arcon plan` (verify method) before `apply`. NVIDIA "open capable" threshold is a PCI id heuristic.
-- **Deviations:** none. Hyprland group installs nautilus' role via GNOME (the v2.5 config uses nautilus; v2.5 installed dolphin, N-06) — dolphin is no longer installed.
+- **Deviations:** none.
+- **Intentional fix (N-06):** the Hyprland group no longer installs dolphin — the v2.5 config uses nautilus, which GNOME already provides.
+
+## Phase 5 — feature migration
+
+- **Done (one module per v2.5 sector, all registered explicitly in `arcon/modules.py`):**
+  - `system` — full upgrade (Arch: keyring first, then `-Su`; never `-Sy` alone), opt-in reflector with mirrorlist backup, opt-in keyring reset (v2.5 behaviour, HIGH), multilib enabled only for gaming, followed by `-Syu`.
+  - `gnome` — gno.conf rendered with D18 (user + wallpaper; default solid black), plan lists only the dconf keys that differ, full `dconf dump /` backup, verification of the owner keys, rollback via the dump; exact-name debloat.
+  - `gaming` — GPU packages from detection: NVIDIA open modules (`nvidia-open` on the stock kernel, `-dkms` + headers for every other kernel, `nvidia-prime` on hybrid), pre-Turing NVIDIA reported (not automated), Ubuntu `ubuntu-drivers`, Debian/Fedora reported (no repo changes); GameMode config at the path GameMode reads (D-08), gamemode group.
+  - `dotfiles` — deploy (D18-checked before writing), `arcon dotfiles diff|capture`; capture never brings generated parts (monitor block, arcon-colors source) into the repo.
+  - `hyprland` — packages + ArCoN's config only (D24), monitor block from detection.
+  - `terminal` / `shell` — Kitty themes via kitty's own kitten (config backed up), Alacritty themes imported (config never overwritten, `curl -f`), Oh-My-Zsh + plugins from pinned commits (no `curl | sh`), `.zshrc` edits only ZSH_THEME/plugins, Starship presets, chsh checked against /etc/shells with the real login shell (getent).
+  - `security` (all opt-in, D23) — tools, sysctl drop-in, ufw/firewalld (SSH allowed before enabling; "inactive" ≠ active), SSH drop-in validated with `sshd -t` and removed again if invalid, USBGuard + SSH key-only behind typed confirmations, scans with reports in the run dir, OpenSnitch. BlackArch: strap.sh SHA-256 shown + typed confirmation (ONE-WAY), no `--overwrite`, removal restores pacman.conf.
+  - `optimization` / `cleanup` — TRIM only on SSD, Bluetooth only with an adapter, ZRAM only when none exists, ananicy-cpp; orphans listed, `paccache -rk2` by default (purge = v2.5 `-Scc`, opt-in).
+  - `arcon reset` (D19) — explicit paths, protected packages' configs kept, user data (browser/editor/chat profiles) never touched, directory backups + dconf dump, typed `CLEAN`.
+  - Preflight — disk, network, live ISO, stale pacman lock (asked, never silent), sudo, optional speed test; reboot prompt only when an action needs it.
+  - `wallp/` removed from the repo (D25; still in `v2.5.0`).
+- **Evidence:**
+  - `uv run pytest` → 130 passed, 1 skipped (the real-run test, opt-in).
+  - **Real run** (`ARCON_REAL_RUN=1`, Ubuntu 24.04 container, `dbus-run-session`): `arcon apply` installed packages via apt, loaded gno.conf into a real dconf database (read back `'prefer-dark'`, picture-options `'none'`), deployed the Terminator config byte-identical, cloned Oh-My-Zsh at the pinned commit, changed the login shell; a second `apply` printed "Nothing to do"; `arcon rollback` removed the deployed files and restored dconf.
+  - Dry run with `profiles/mrfedai.toml` leaves `$HOME` untouched (checked).
+- **Bugs found and fixed while testing:** `$USER` unset crashed chsh/gamemode (now getent/getpass); dry run created `~/.oh-my-zsh/custom/plugins`; a broken third-party apt source aborted every install (now a warning); chsh was re-planned every run because `$SHELL` is not the login shell.
+- **NOT tested:** Arch/Debian/Fedora real runs (CI Phase 7 = containers only), NVIDIA driver install, multilib, reflector, BlackArch, USBGuard, OpenSnitch, scans, firewall on a real host, Mutter display changes, Hyprland — all UNIT at most.
+- **Deviations:** none.

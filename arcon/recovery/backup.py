@@ -38,6 +38,22 @@ class FileChanger:
     journal: Journal
     runner: Runner
 
+    def backup_only(self, target: Path, root: bool = False) -> None:
+        """Record a verified backup of a file another program is about to change."""
+        target = Path(target)
+        if self.runner.dry_run:
+            self.journal.write("file_planned", path=str(target), existed=target.exists())
+            return
+        backup = None
+        if target.exists():
+            backup = _backup_path(self.journal, target)
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(target, backup)
+            if sha256_file(backup) != sha256_file(target):
+                raise OSError(f"backup verification failed for {target}")
+        self.journal.write("file_backup", path=str(target), existed=target.exists(),
+                           backup=str(backup) if backup else None, root=root)
+
     def write(self, target: Path, content: bytes, *, root: bool = False, mode: int | None = None) -> bool:
         """Write `content` to `target`. Returns False when the file already has
         exactly this content (idempotent, nothing recorded)."""
@@ -79,11 +95,43 @@ class FileChanger:
         return True
 
 
+def backup_dir(journal: Journal, source: Path) -> Path | None:
+    """Copy a whole directory into the run's backup area (factory reset)."""
+    if not source.exists():
+        return None
+    dest = _backup_path(journal, source)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if source.is_dir():
+        shutil.copytree(source, dest, symlinks=True, dirs_exist_ok=True)
+    else:
+        shutil.copy2(source, dest)
+    journal.write("dir_backup", path=str(source), backup=str(dest))
+    return dest
+
+
 def restore_files(journal: Journal, runner: Runner) -> list[str]:
-    """Undo every file change of a run, newest first. Returns report lines."""
+    """Undo every file (and dconf) change of a run, newest first. Returns report lines."""
     report = []
-    backups = [ev for ev in journal.events() if ev["event"] == "file_backup"]
-    for ev in reversed(backups):
+    events = [ev for ev in journal.events() if ev["event"] in ("file_backup", "dconf_backup", "dir_backup")]
+    for ev in reversed(events):
+        if ev["event"] == "dir_backup":
+            src, target = Path(ev["backup"]), Path(ev["path"])
+            if src.is_dir():
+                shutil.copytree(src, target, symlinks=True, dirs_exist_ok=True)
+            elif src.exists():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, target)
+            report.append(f"restored {target}" if src.exists() else f"MISSING BACKUP {target}")
+            continue
+        if ev["event"] == "dconf_backup":
+            dump = Path(ev["path"])
+            if dump.exists():
+                runner.run(["dconf", "reset", "-f", "/"])
+                runner.run(["dconf", "load", "/"], input=dump.read_text())
+                report.append("restored GNOME settings (dconf) from the full backup")
+            else:
+                report.append(f"MISSING BACKUP {dump}")
+            continue
         target = Path(ev["path"])
         root = ev.get("root", False)
         if ev["existed"]:
@@ -103,5 +151,5 @@ def restore_files(journal: Journal, runner: Runner) -> list[str]:
             elif target.exists():
                 target.unlink()
             report.append(f"removed {target} (did not exist before)")
-    journal.write("rollback", files=len(backups))
+    journal.write("rollback", items=len(events))
     return report

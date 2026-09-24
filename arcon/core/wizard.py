@@ -24,6 +24,8 @@ def _mod(name: str) -> Callable[[Profile], bool]:
 
 
 QUESTIONS: tuple[Question, ...] = (
+    Question("modules", "system", "Update the system first (full upgrade)?"),
+    Question("system", "mirrors", "Arch: benchmark and pick the fastest mirrors (reflector)?", when=_mod("system")),
     Question("modules", "packages", "Install packages?"),
     Question("modules", "gnome", "Apply GNOME settings (dark theme, keybindings, app folders)?"),
     Question("gnome", "debloat", "Remove GNOME bloatware (Tour, Weather, Maps, Contacts, Music, Web)?", when=_mod("gnome")),
@@ -40,7 +42,7 @@ QUESTIONS: tuple[Question, ...] = (
     Question("shell", "name", "Shell", ("zsh", "fish", "bash", "none"), when=_mod("shell")),
     Question("modules", "gaming", "Gaming mode (Steam, GameMode, GPU drivers)?"),
     Question("modules", "blackarch", "BlackArch repository (Arch only)?"),
-    Question("blackarch", "install", "BlackArch tools", ("none", "core", "full"), when=_mod("blackarch")),
+    Question("blackarch", "install", "BlackArch", ("core", "full", "remove"), when=_mod("blackarch")),
     Question("modules", "security", "Security tools and hardening?"),
     Question("security", "tools", "Install security tools (arch-audit/debsecan, ClamAV, rkhunter, Lynis, Firejail, nethogs)?", when=_mod("security")),
     Question("security", "firewall", "Enable firewall (deny incoming, SSH kept reachable if running)?", when=_mod("security")),

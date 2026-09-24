@@ -57,6 +57,11 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("doctor", help="show detected platform, hardware and recovery options")
     dp = sub.add_parser("display", help="show monitors / save the current layout to the profile")
     dp.add_argument("what", choices=("show", "capture"))
+    df = sub.add_parser("dotfiles", help="diff deployed dotfiles / capture them back into the repo")
+    df.add_argument("what", choices=("diff", "capture"))
+    rs = sub.add_parser("reset", help="Smart Factory Reset (backup first, typed confirmation)")
+    rs.add_argument("--uninstall", action="store_true", help="also uninstall packages ArCoN installs")
+    rs.add_argument("--gnome", action="store_true", help="also reset all GNOME settings")
     return p
 
 
@@ -120,6 +125,12 @@ class App:
                 self.ui.info("Cancelled — nothing was changed.")
                 journal.write("run_end", summary={"cancelled": True})
                 return EXIT_OK
+            from arcon.core import preflight
+            if not preflight.run(self.os, self.runner, self.ui, needs_network=True, dry_run=False,
+                                 speedtest=profile.get("system", "speedtest")):
+                self.ui.error("Preflight checks failed — nothing was changed.")
+                journal.write("run_end", summary={"preflight": "failed"})
+                return EXIT_FAILED
             provider = snapshot.detect(self.runner)
             if provider:
                 ok = provider.create(self.runner, f"arcon {journal.run_id}")
@@ -129,7 +140,11 @@ class App:
                 journal.write("snapshot", provider=None)
                 self.ui.info("No filesystem snapshot tool configured — changed files are backed up individually.")
         execute(ctx, plan, keep_going=self.args.keep_going)
-        return report(ctx, plan)
+        code = report(ctx, plan)
+        if not self.runner.dry_run and any(p.action.reboot and p.status == "done" for p in plan.items) \
+                and self.ui.interactive and not self.args.yes and self.ui.confirm("Reboot now?", default=False):
+            self.runner.run(["systemctl", "reboot"], sudo=True)
+        return code
 
     # ---- commands ---------------------------------------------------------------
     def cmd_default(self) -> int:
@@ -201,6 +216,45 @@ class App:
         import tomlkit
         self.ui.console.print(tomlkit.dumps(profile.as_dict()), highlight=False, markup=False)
         return EXIT_OK
+
+    def cmd_dotfiles(self) -> int:
+        from arcon.dotfiles.manager import DOTFILES, capture, diff
+        journal = Journal.create(self.paths.runs, command=f"dotfiles {self.args.what}")
+        ctx = self.context(self.load_profile(), journal)
+        profile = ctx.profile
+        for d in DOTFILES:
+            if not profile.enabled(d.module):
+                continue
+            if self.args.what == "diff":
+                text = diff(ctx, d)
+                self.ui.console.print(text or f"{d.target}: in sync", markup=False, highlight=False)
+            elif capture(ctx, d):
+                self.ui.ok(f"captured ~/{d.target} -> {d.source}")
+        if self.args.what == "capture":
+            self.ui.info("GNOME settings are captured with `dconf dump` by hand for now; review with git diff.")
+            self.ui.warn("tests/golden/sources.sha256 will fail until you approve the new files (by design, D8).")
+        return EXIT_OK
+
+    def cmd_reset(self) -> int:
+        from arcon.recovery.reset import reset_actions
+        blocked = self.guard_platform()
+        if blocked is not None:
+            return blocked
+        journal = Journal.create(self.paths.runs, command="reset", dry_run=self.runner.dry_run)
+        setup_file_logging(journal.run_dir / "arcon.log", self.args.verbose)
+        ctx = self.context(self.load_profile(), journal)
+        plan = build_plan(ctx, reset_actions(self.args.uninstall, self.args.gnome))
+        show_plan(ctx, plan)
+        if not plan.pending:
+            return EXIT_OK
+        if not self.runner.dry_run and not self.ui.typed_confirm(
+                "SMART FACTORY RESET — everything above is backed up first and can be restored with `arcon rollback`.",
+                "CLEAN"):
+            self.ui.info("Cancelled — nothing was changed.")
+            journal.write("run_end", summary={"cancelled": True})
+            return EXIT_OK
+        execute(ctx, plan, keep_going=True)
+        return report(ctx, plan)
 
     def cmd_display(self) -> int:
         from arcon.display.actions import gnome_backend, targets_for

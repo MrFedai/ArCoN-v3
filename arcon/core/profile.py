@@ -40,6 +40,13 @@ def _groups(v: Any) -> bool:
     return _str_list(v) and all(x in GROUPS for x in v)
 
 
+OPTIMIZATIONS = ("fstrim", "bluetooth", "zram", "ananicy")
+
+
+def _optimizations(v: Any) -> bool:
+    return _str_list(v) and all(x in OPTIMIZATIONS for x in v)
+
+
 def _monitors(v: Any) -> bool:
     if not isinstance(v, list):
         return False
@@ -51,7 +58,7 @@ def _monitors(v: Any) -> bool:
 SCHEMA: dict[str, dict[str, tuple[Any, Callable[[Any], bool]]]] = {
     "profile": {"name": ("default", _str)},
     "modules": {m: (d, _bool) for m, d in {
-        "packages": True, "gnome": True, "hyprland": False, "dotfiles": True, "display": True,
+        "system": True, "packages": True, "gnome": True, "hyprland": False, "dotfiles": True, "display": True,
         "terminal": True, "shell": True, "gaming": False, "blackarch": False,
         "security": False, "optimization": True, "cleanup": True,
     }.items()},
@@ -61,6 +68,12 @@ SCHEMA: dict[str, dict[str, tuple[Any, Callable[[Any], bool]]]] = {
         "custom_file": ("", _str),
         "flatpak_fallback": (True, _bool),                      # D22
         "aur_helper": ("yay", _one_of("yay", "paru")),
+    },
+    "system": {
+        "upgrade": (True, _bool),          # full system upgrade before installing (no partial upgrades)
+        "mirrors": (False, _bool),         # Arch: reflector benchmark, mirrorlist backed up
+        "keyring_reset": (False, _bool),   # Arch: v2.5 wiped /etc/pacman.d/gnupg every run — opt-in, HIGH risk
+        "speedtest": (False, _bool),       # v2.5 Cloudflare download test (informational)
     },
     "gnome": {"debloat": (False, _bool)},
     "wallpaper": {
@@ -74,19 +87,20 @@ SCHEMA: dict[str, dict[str, tuple[Any, Callable[[Any], bool]]]] = {
     },
     "terminal": {
         "emulator": ("terminator", _one_of("terminator", "kitty", "alacritty", "gnome-terminal", "none")),
-        "theme": ("", _str),
+        "theme": ("", _one_of("", "dracula", "nord", "gruvbox_dark", "tokyo_night")),
     },
     "shell": {
         "name": ("none", _one_of("zsh", "fish", "bash", "none")),
         "zsh_theme": ("agnoster", _one_of("agnoster", "robbyrussell", "bira", "powerlevel10k")),
-        "starship_preset": ("", _str),
+        "starship_preset": ("", _one_of("", "pastel-powerline", "tokyo-night", "pure-preset", "gruvbox-rainbow",
+                                         "nerd-font-symbols", "plain-text-symbols")),
     },
     "gaming": {"gpu": ("auto", _one_of("auto", "nvidia", "amd", "intel", "none"))},
-    "blackarch": {"install": ("none", _one_of("none", "core", "full"))},
+    "blackarch": {"install": ("core", _one_of("core", "full", "remove"))},
     "security": {k: (False, _bool) for k in (
         "tools", "scans", "sysctl", "firewall", "ssh_root_login",
         "ssh_disable_password", "opensnitch", "usbguard")},
-    "optimization": {"items": ([], _str_list)},
+    "optimization": {"items": (["fstrim", "bluetooth", "zram", "ananicy"], _optimizations)},
     "cleanup": {
         "orphans": (True, _bool),
         "cache": ("trim", _one_of("trim", "none", "purge")),

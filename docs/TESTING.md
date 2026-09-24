@@ -30,6 +30,6 @@ Golden files: `tests/golden/v25/*.json`. Regenerate only deliberately: `python t
 | `tests/golden/owner_settings.json` | settings that must survive every version |
 | `tests/golden/v3/gno.conf` | expected deploy for user `arcontest`, default black wallpaper |
 | `tests/golden/v3/hyprlock.conf` | expected deploy without Ax-Shell |
-| `tests/helpers/dotfile_rules.py` | D18 checker, reused by the Python deploy/verify step in Phase 5 |
+| `arcon/dotfiles/rules.py` | D18 checker, used by the deploy/verify step and the tests |
 
 `hyprland.conf` v3 golden is deferred to Phase 4 (depends on detected monitors).

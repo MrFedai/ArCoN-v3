@@ -28,3 +28,9 @@ class Paths:
     @property
     def runs(self) -> Path:
         return self.state / "runs"
+
+
+def current_user() -> str:
+    """Login name of the user running ArCoN ($USER may be unset in some shells)."""
+    import getpass
+    return os.environ.get("USER") or getpass.getuser()

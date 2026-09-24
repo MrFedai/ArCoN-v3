@@ -76,8 +76,10 @@ class Apt(PackageManager):
         repo = set(self.runner.run(["apt-cache", "pkgnames"], mutating=False, check=False, timeout=120).stdout.split())
         return set(names) & repo
 
-    def refresh(self) -> None:
-        self.runner.run([*self._env, "apt-get", "update"], sudo=True, interactive=True)
+    def refresh(self) -> bool:
+        """False when some repository could not be refreshed (e.g. a broken third-party
+        source); installation continues with the indexes that did update."""
+        return self.runner.run([*self._env, "apt-get", "update"], sudo=True, interactive=True, check=False).ok
 
     def install(self, names: list[str]) -> None:
         if names:

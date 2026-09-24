@@ -59,6 +59,9 @@ If you find a strong technical reason to deviate, STOP, explain the reason and w
 6. Do not overwrite working code without a documented reason.
 7. Report facts with evidence (command + output). If something was not run, say NOT TESTED.
 
+## Status (2026-09-24)
+Phases 1–8 done on `v3-dev` (see docs/PROGRESS.md, docs/FINAL_AUDIT.md). Next: push, CI run, native test on the owner's Arch machine (checklist in FINAL_AUDIT), then release per D27.
+
 ## Phase roadmap (continuous mode)
 Work through the phases without waiting for approval between them. STOP only when a decision is genuinely the owner's (a new trade-off not covered by D1–D19 or the answered decisions below). Commit once per phase (Conventional Commits). After every phase: append the phase report to `docs/PROGRESS.md` and save a git bundle as backup. Push once at the end (or whenever push access exists).
 

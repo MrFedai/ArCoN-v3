@@ -85,3 +85,10 @@ D20–D28 recorded (Arch dual-boot + NVIDIA, English + rich CLI, Flatpak fallbac
 - **Evidence:** workflow parses (PyYAML), ShellCheck/compileall clean locally, 132 passed; real-run test passes again on Ubuntu 24.04 after the generalisation.
 - **NOT tested:** the workflow itself has **not run** — it needs the branch on GitHub. Docker Hub is blocked in this environment, so no local container matrix either.
 - **Deviations:** none.
+
+## Phase 8 — documentation and final audit
+
+- **Done:** `CHANGELOG.md`, `docs/FINAL_AUDIT.md` (verdict per area, known risks, native checklist), CLAUDE.md status.
+- **Evidence:** see FINAL_AUDIT — no FAIL; PASS areas are backed by integration runs in the Ubuntu container.
+- **NOT tested:** everything marked NOT TESTED / PARTIAL in FINAL_AUDIT; no VM or native run.
+- **Deviations:** none. Release (D27: merge to main, tag v3.0.0, archive the Bash branch) is **not** done — it waits for push access, a green CI run and the native checklist.

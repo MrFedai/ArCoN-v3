@@ -29,6 +29,15 @@ If you find a strong technical reason to deviate, STOP, explain the reason and w
 | D17 | **Existing `v3.0` branch (Bash + PowerShell, 2026-09-23) is a REFERENCE, not the base.** v3.0 is rebuilt in Python on `v3-dev` (branched from `main` / tag `v2.5.0`). Reuse from `v3.0`: bug-fix knowledge, `data/packages.catalog` and `data/optimizations.catalog` (after re-verification), bats tests as behavior specification. Do NOT trust its documentation claims without evidence: many docs it links (ARCHITECTURE, SECURITY, PLATFORMS, FINAL-AUDIT, TESTING, CHANGELOG, MIGRATION) do not exist on the branch. Never delete or rewrite the `v3.0` branch. |
 | D18 | **Allowed dotfile substitutions (exhaustive list — anything else is a D8 violation).** (1) `gno.conf`: `USER_PLACEHOLDER` → user name; the wallpaper keys `picture-uri`, `picture-uri-dark`, `picture-options` in `[org/gnome/desktop/background]` and `[org/gnome/desktop/screensaver]` are driven by the profile `wallpaper` setting. **Default wallpaper = none → solid black** (`picture-uri=''`, `picture-uri-dark=''`, `picture-options='none'`; `primary-color='#000000000000'` already in the file). (2) `hyprland.conf`: the `monitor=` lines are replaced by ONE generated block between `# >>> ArCoN monitors (generated) >>>` and `# <<< ArCoN monitors <<<`; every other line untouched. (3) `hyprlock.conf`: when Ax-Shell is not installed, line `source = ~/.config/Ax-Shell/config/hypr/colors.conf` → `source = ~/.config/hypr/arcon-colors.conf`, and `arcon-colors.conf` is deployed. Golden files in `tests/golden/v3/` encode these rules. |
 | D19 | **Smart Factory Reset is kept**, restricted: every path to delete and every package to remove is listed explicitly in the plan (no `~/.config/<pkg>` guessing), the protected-package list is enforced for configs too, a verified backup (incl. `dconf dump /`) is taken first, typed confirmation stays. |
+| D20 | **Owner environment:** Arch Linux, dual-boot on the owner's machine, NVIDIA GPU. The NVIDIA path gets the most careful tests. Native tests (Phase 7) are run by the owner on that machine; this session only reaches the Windows side. |
+| D21 | **UI:** English (UI, logs, docs). Coloured CLI with `rich` (tables, progress bars) on top of stdlib `argparse`; no TUI. TOML writer: `tomlkit` — keeps comments and ordering when the wizard rewrites a hand-edited profile (`tomli-w` would drop them). |
+| D22 | **Packages missing from a distro's repos fall back to Flatpak (Flathub)**, marked "Flatpak" in the up-front summary; no extra prompt. |
+| D23 | **Security module: everything kept, everything opt-in** (tools, scans, sysctl, firewall, SSH, OpenSnitch, USBGuard). USBGuard and SSH password-auth disable require typed confirmation. |
+| D24 | **Hyprland in v3.0 = ArCoN's own config only.** Third-party theme installers (Ax-Shell, HyDE, ML4W, JaKooLit) are deferred to v3.1. D16 still applies to the remaining third-party code (BlackArch `strap.sh`); Oh-My-Zsh and plugins are installed by pinned `git clone`, never `curl \| sh`. |
+| D25 | **Wallpapers leave the public repo.** `wallp/` is removed from v3 (stays in git history / `v2.5.0`). Optional private repo, default `MrFedai/ArCoN-wallpapers` (configurable `wallpaper.repo`), cloned with the user's own git credentials. Default wallpaper stays solid black (D18). |
+| D26 | **Owner profile `profiles/mrfedai.toml`:** GNOME settings + Terminator + **Zsh + Oh-My-Zsh**, optimization + cleanup ON; package groups base + essentials + media + cyber (D28); Gaming, BlackArch, security hardening OFF by default (selectable in the wizard). |
+| D27 | **Release:** when done, `v3-dev` → `main`, tag `v3.0.0`; the Bash `v3.0` branch is kept as `archive/v3.0-bash`. `v2.5.0` tag untouched. |
+| D28 | **Package groups (v3):** base (always), essentials, media, cyber, remote, privacy, power; timeshift → recovery, ananicy-cpp → optimization; removed: x11vnc, stacer, stirling-pdf, pinokio, flameshot, switcheroo. Full table: `docs/PACKAGE_REVIEW.md`. Owner profile default groups: base + essentials + media + cyber. |
 | D16 | **Third-party installers** (Ax-Shell, Hyprdots/HyDE, ML4W, JaKooLit, oh-my-zsh, BlackArch strap.sh — anything `curl | sh` or `git clone && ./install.sh`) are kept as OPTIONAL actions labeled **ONE-WAY**: excluded from rollback promises, shown with a warning in the summary, never selected by default. |
 
 ## Architecture rules
@@ -50,7 +59,9 @@ If you find a strong technical reason to deviate, STOP, explain the reason and w
 6. Do not overwrite working code without a documented reason.
 7. Report facts with evidence (command + output). If something was not run, say NOT TESTED.
 
-## Phase roadmap (one phase per session; stop and wait for owner approval after each)
+## Phase roadmap (continuous mode)
+Work through the phases without waiting for approval between them. STOP only when a decision is genuinely the owner's (a new trade-off not covered by D1–D19 or the answered decisions below). Commit once per phase (Conventional Commits). After every phase: append the phase report to `docs/PROGRESS.md` and save a git bundle as backup. Push once at the end (or whenever push access exists).
+
 1. Audit (read-only): repo, features, configs, dependencies, unsafe operations, debt. Verify `docs/PRIOR_AUDIT.md`.
 2. Golden-file tests: capture WHAT v2.5 writes (target paths + content of deployed dotfiles, dconf keys loaded, package lists per section). Do not try to characterize the whole interactive script.
 3. Core skeleton: CommandRunner, profile (TOML), journal/recovery, wizard + summary + confirm flow, CLI shell, Windows/macOS stubs.
@@ -61,8 +72,7 @@ If you find a strong technical reason to deviate, STOP, explain the reason and w
 8. Documentation, changelog, final audit (PASS / FAIL / PARTIAL / NOT TESTED with evidence).
 
 ## Open questions (do not decide these yourself — list them when relevant)
-- Wallpapers in `wallp/` include third-party IP; public-repo licensing not decided.
-- Security scan / hardening module scope for v3.0 not decided.
+- None at the moment.
 
-## Reporting format after every phase
+## Reporting format after every phase (in `docs/PROGRESS.md`)
 What was done · Evidence · What is NOT tested · Risks · Deviations from these rules (should be none) · Questions for the owner.

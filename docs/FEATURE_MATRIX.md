@@ -15,7 +15,7 @@ Source of feature IDs: `docs/AUDIT.md` §2. Update this file in every phase.
 | F05 | Live-USB detection | core/preflight.py | fix (was commented out) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F06 | OS detection | platform/detect.py | fix (parse, don't source) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F07 | package-manager selection | package/registry.py | replace | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
-| F08 | package groups (76) | data/packages.toml | replace (per-distro names) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
+| F08 | package groups (76 → 7 groups, 70 kept, 6 removed: D28) | data/packages.toml | replace (per-distro names) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F09 | main menu | cli.py / core/wizard.py | replace (D14) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F10 | Smart Factory Reset | recovery/reset.py | fix (D19: explicit paths, protected list, verified backup) | partial | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |
 | F11 | resume | recovery/journal.py | fix (never worked) | n/a | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | NOT MIGRATED | stub | stub |

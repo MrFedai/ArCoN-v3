@@ -91,12 +91,15 @@ def test_apply_then_rollback(tmp_path):
     failed = [e for e in events if e.get("status") == "failed" and e["id"] not in allowed]
     assert not failed, failed
 
-    # second run: idempotent — nothing left to do
+    # second run: idempotent — nothing left to do. The console shows action
+    # titles, not ids, so an Arch-as-root run (AUR actions stay pending, see
+    # above) is judged by its journal: only the allowed actions may run again.
     again = run(home, *arcon, "apply", check=False)
-    if os.geteuid() == 0 and "packages.aur" in again.stdout:
-        pass  # Arch as root: AUR actions stay pending (see above)
-    else:
-        assert "Nothing to do" in again.stdout, again.stdout[-3000:]
+    if "Nothing to do" not in again.stdout:
+        newest = max(p for p in (home / ".local" / "state" / "arcon" / "runs").iterdir() if p.is_dir())
+        rerun = {e["id"] for e in map(json.loads, (newest / "journal.jsonl").read_text().splitlines())
+                 if e.get("event") == "action" and e.get("status") in ("started", "done", "failed")}
+        assert newest != runs[-1] and rerun and rerun <= allowed, (sorted(rerun), again.stdout[-3000:])
 
     run(home, *arcon, "rollback", runs[-1].name)
     assert not term.exists() and not (home / ".zshrc").exists()

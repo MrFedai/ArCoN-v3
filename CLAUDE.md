@@ -59,8 +59,14 @@ If you find a strong technical reason to deviate, STOP, explain the reason and w
 6. Do not overwrite working code without a documented reason.
 7. Report facts with evidence (command + output). If something was not run, say NOT TESTED.
 
-## Status (2026-09-24)
-Phases 1–8 done on `v3-dev` (see docs/PROGRESS.md, docs/FINAL_AUDIT.md). Repository: v3 lives in its own repo `MrFedai/ArCoN-v3` (owner decision), branch `main` = former `v3-dev`, full history and tag `v2.5.0` included; `MrFedai/ArCoN` stays the working v2.5. D27 is replaced by this. Next: push, CI run, native test on the owner's Arch machine (checklist in FINAL_AUDIT), then release per D27.
+## Status (2026-10-10)
+Phases 1–8 done on `v3-dev` (see docs/PROGRESS.md, docs/FINAL_AUDIT.md). Repository: v3 lives in its own repo `MrFedai/ArCoN-v3` (owner decision), branch `main` = former `v3-dev`, full history and tag `v2.5.0` included; `MrFedai/ArCoN` stays the working v2.5. D27 is replaced by this. Pushed; CI run 36058864740 green on all jobs (lint, unit, archlinux, debian:stable, ubuntu:24.04, fedora). Next: native test on the owner's Arch machine (checklist in FINAL_AUDIT), then release per D27.
+
+## Development environment
+- This session runs in **WSL 2 Ubuntu**, not on the owner's Arch machine.
+- Allowed here: `uv run pytest`, `shellcheck`, `gh`, read-only `arcon` commands (`plan`, `doctor`, `--help`).
+- NOT allowed here: `arcon apply`, `rollback`, `reset`, `ARCON_REAL_RUN=1`. Real runs happen in CI containers or natively on the owner's machine.
+- Code changes: show the plan first, then a branch + PR; no direct commits to `main`.
 
 ## Phase roadmap (continuous mode)
 Work through the phases without waiting for approval between them. STOP only when a decision is genuinely the owner's (a new trade-off not covered by D1–D19 or the answered decisions below). Commit once per phase (Conventional Commits). After every phase: append the phase report to `docs/PROGRESS.md` and save a git bundle as backup. Push once at the end (or whenever push access exists).

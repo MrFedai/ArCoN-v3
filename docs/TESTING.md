@@ -40,23 +40,23 @@ Golden files: `tests/golden/v25/*.json`. Regenerate only deliberately: `python t
 
 | Job | Runs | Status |
 |---|---|---|
-| lint | ShellCheck, `compileall` | PASS (runs 35993001306, 36054621202) |
-| unit | full pytest as user, characterization as root (Arch scenarios) | PASS in run 35993001306; run 36054621202 did not start: `astral-sh/setup-uv@v10` does not exist (setup-uv has no major tags since v8) — now pinned to `v10.2.0` |
-| distro × {archlinux, debian:stable, ubuntu:24.04, fedora} | catalog verification per distro, dry run of `profiles/mrfedai.toml`, real apply + rollback | run 36054621202: **debian:stable and ubuntu:24.04 PASS** (incl. real apply + rollback); archlinux and fedora: catalog + dry run PASS, **real apply + rollback FAIL** — see below |
+| lint | ShellCheck, `compileall` | PASS (latest: run 36058864740) |
+| unit | full pytest as user, characterization as root (Arch scenarios) | PASS (latest: run 36058864740); run 36054621202 did not start: `astral-sh/setup-uv@v10` does not exist (setup-uv has no major tags since v8) — now pinned to `v10.2.0` |
+| distro × {archlinux, debian:stable, ubuntu:24.04, fedora} | catalog verification per distro, dry run of `profiles/mrfedai.toml`, real apply + rollback | run 36058864740 (commit `fc6ed43`): **all four PASS**, incl. real apply → idempotent re-run → rollback. History below |
 
 Expected on Arch in a root container: the AUR actions fail (makepkg refuses root) — the test allows exactly those two, also on the idempotency re-run (judged by the journal, not by console text).
 
 **First CI run (35993001306) — real apply + rollback:**
 - debian:stable, ubuntu:24.04 — cause found: the images have no `dconf-service` (`dconf-cli` does not pull it in), so every dconf write failed with `ServiceUnknown: ca.desrt.dconf`. A desktop always has it; the workflow now installs it — confirmed green in CI run 36054621202. Reproduced and fix verified in a fresh Ubuntu 24.04 minbase rootfs (debootstrap + chroot, the workflow's exact commands) — not in Docker (Docker Hub blocked here).
-- archlinux, fedora — cause found from the `arcon-runs-0` / `arcon-runs-3` artifacts of run 36055367756: `shell.chsh` failed with `/usr/sbin/zsh is not listed in /etc/shells`. Both distros merged /usr/sbin into /usr/bin, so `which zsh` (root's PATH has sbin first) returns /usr/sbin/zsh — the same file as the listed /usr/bin/zsh. `ChangeShell` now picks the /etc/shells entry that points to the same file. Reproduced (same error) and fix verified on Ubuntu 24.04 with a merged-sbin symlink; unit test added. Run 36056633594 (with that fix): **archlinux PASS**; fedora got further and failed at `arcon rollback`: `dconf dump /` shows the merged view incl. Fedora's system database (authselect's locked `/org/gnome/login-screen/enable-*-authentication` keys), and loading that backup back failed with "non-writable keys". Backups/restores now use the user database only (`DCONF_PROFILE` = `user-db:user`). Reproduced (same error) and fix verified on Ubuntu 24.04 with a Fedora-like locked system dconf database plus merged sbin; unit test added. Real Fedora container: NOT TESTED until the next CI run. Also fixed earlier: the Arch-as-root idempotency check (console shows titles, not ids).
+- archlinux, fedora — cause found from the `arcon-runs-0` / `arcon-runs-3` artifacts of run 36055367756: `shell.chsh` failed with `/usr/sbin/zsh is not listed in /etc/shells`. Both distros merged /usr/sbin into /usr/bin, so `which zsh` (root's PATH has sbin first) returns /usr/sbin/zsh — the same file as the listed /usr/bin/zsh. `ChangeShell` now picks the /etc/shells entry that points to the same file. Reproduced (same error) and fix verified on Ubuntu 24.04 with a merged-sbin symlink; unit test added. Run 36056633594 (with that fix): **archlinux PASS**; fedora got further and failed at `arcon rollback`: `dconf dump /` shows the merged view incl. Fedora's system database (authselect's locked `/org/gnome/login-screen/enable-*-authentication` keys), and loading that backup back failed with "non-writable keys". Backups/restores now use the user database only (`DCONF_PROFILE` = `user-db:user`). Reproduced (same error) and fix verified on Ubuntu 24.04 with a Fedora-like locked system dconf database plus merged sbin; unit test added. Run 36058864740 (with both fixes): **fedora PASS**, incl. real apply + rollback. Also fixed earlier: the Arch-as-root idempotency check (console shows titles, not ids).
 
 **One-line install** (`git clone … ~/ArCoN-v3 && ~/ArCoN-v3/setup.sh`): run as a normal sudo user on a fresh Ubuntu 24.04 minbase rootfs (debootstrap + chroot, no python3): `setup.sh` installed python3 + python3-venv, uv, and started `arcon` (`--version`, `doctor`, `plan` OK). Arch/Fedora path (uv from pacman/dnf): NOT TESTED.
 
-## Test status by level (2026-09-24)
+## Test status by level (2026-10-10)
 
 | Level | What actually ran |
 |---|---|
-| UNIT | 132 tests pass (`uv run pytest`; 1 opt-in real-run test skipped) |
-| INTEGRATION (container) | characterization of v2.5 (Ubuntu + Arch via mount namespace, mocked tools); real apply/rollback on Ubuntu 24.04; real dconf load; catalog check on Ubuntu 24.04 |
+| UNIT | 132 tests pass (`uv run pytest`); outside a root container 3 are skipped: 2 Arch characterization scenarios, 1 opt-in real run |
+| INTEGRATION (container) | characterization of v2.5 (Ubuntu + Arch via mount namespace, mocked tools); CI run 36058864740: real apply → idempotent re-run → rollback on archlinux, debian:stable, ubuntu:24.04, fedora (one real package, `tree`, via pacman/apt/dnf; AUR actions fail as root by design); real dconf load; catalog check on all four distros |
 | VM | none |
 | NATIVE | none — first native run: the owner's Arch machine (see docs/FINAL_AUDIT.md, "native checklist") |
